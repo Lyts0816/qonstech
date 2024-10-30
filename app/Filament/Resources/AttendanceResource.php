@@ -156,12 +156,14 @@ class AttendanceResource extends Resource
                             ->label('Select Payroll') // Label for the field
                             ->required(fn(string $context) => $context === 'create' || $context === 'edit')
                             ->options(function () {
-                                return Payroll::orderBy('PayrollYear')
+                                return Payroll::with('project')
+																		->orderBy('PayrollYear')
                                     ->orderBy('PayrollMonth')
                                     ->orderBy('PayrollDate2')
                                     ->get()
                                     ->mapWithKeys(function ($payroll) {
-                                        $displayText = "{$payroll->PayrollMonth},{$payroll->PayrollYear} - {$payroll->PayrollDate2} | {$payroll->EmployeeStatus} - {$payroll->assignment} ";
+																				$projectName = $payroll->project->ProjectName ?? 'No Project'; // Use 'No Project' if the name is null
+                                        $displayText = "{$payroll->PayrollMonth},{$payroll->PayrollYear} - {$payroll->PayrollDate2} | {$payroll->EmployeeStatus} - {$payroll->assignment} | {$projectName}";
                                         return [$payroll->id => $displayText];
                                     });
                             })
