@@ -14,7 +14,7 @@ class OvertimePolicy
     public function viewAny(User $user): bool
     {
         //
-        return $user->role === User::ROLE_ADMIN || $user->isClerk();
+        return false;
     }
 
     /**
@@ -23,7 +23,7 @@ class OvertimePolicy
     public function view(User $user, Overtime $overtime): bool
     {
         //
-        return $user->role === User::ROLE_ADMIN || $user->isClerk();
+        return false;
     }
 
     /**
@@ -32,7 +32,7 @@ class OvertimePolicy
     public function create(User $user): bool
     {
         //
-        return $user->role === User::ROLE_ADMIN || $user->isClerk();
+        return false;
     }
 
     /**

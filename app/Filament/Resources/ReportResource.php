@@ -29,6 +29,7 @@ use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 use DateTime;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Filament\Tables\Actions\ButtonAction;
 use Filament\Forms\Components\Fieldset;
@@ -274,7 +275,7 @@ class ReportResource extends Resource
                                         });
                                     } catch (\Exception $e) {
                                         // Log the exception or handle it as needed
-                                        \Log::error('Error fetching week periods: ' . $e->getMessage());
+                                        Log::error('Error fetching week periods: ' . $e->getMessage());
                                         return [];
                                     }
                                 }
@@ -390,12 +391,12 @@ class ReportResource extends Resource
                     ->visible(fn($record) => $record->ReportType != 'Payslip'),
 
 
-                Tables\Actions\EditAction::make(),
+                // Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                // Tables\Actions\BulkActionGroup::make([
+                //     Tables\Actions\DeleteBulkAction::make(),
+                // ]),
             ]);
     }
 

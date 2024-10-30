@@ -155,7 +155,13 @@ class UserResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make()
                 ->hidden(fn($record) => $record->trashed()),
-                Tables\Actions\DeleteAction::make()->label('Deactivate'),
+
+                Tables\Actions\DeleteAction::make()->label('Deactivate')
+                ->modalSubmitActionLabel('Deactivate')
+                ->modalHeading('Deactivate User')
+                ->hidden(fn($record) => $record->trashed())
+                ->successNotificationTitle('User Deactivated'),
+
                 Tables\Actions\ForceDeleteAction::make(),
                 Tables\Actions\RestoreAction::make(),
             ])

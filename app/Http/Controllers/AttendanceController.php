@@ -19,6 +19,7 @@ class AttendanceController extends Controller
 			$employeeId = $request->query('employee_id');
 			$projectId = $request->query('project_id');
 
+			
 			$dompdf = new Dompdf();
 			// Render each employee's payslip
 			$payslipHtml = '';
@@ -33,6 +34,8 @@ class AttendanceController extends Controller
 				->where('ProjectID', $projectId)
 				->orderBy('Date', 'asc')
 				->get();
+
+				dd($data);
 
 			if (count($data) > 0) {
 				$TotalHours = 0;
@@ -173,7 +176,7 @@ class AttendanceController extends Controller
 				->where('Date', $date)
 				->orderBy('Date', 'ASC')
 				->get();
-// dd($attendance->toArray());
+		// dd($attendance->toArray());
 			foreach ($attendance as $attendances) {
 
 				$employeesWPosition = \App\Models\Employee::where('project_id', $payroll->ProjectID)

@@ -145,10 +145,11 @@ class AttendanceResource extends Resource
                     ->color('primary')
                     ->url(fn() => route('dtr.show', [
                         'employee_id' => Session::get('selected_employee_id'),
-                        'project_id' => Session::get('selected_project_id'),
+                        // 'project_id' => Session::get('selected_project_id'),
                     ]))
                     ->openUrlInNewTab(),
                 Action::make('viewSummary')
+                    ->openUrlInNewTab()
                     ->label('View Attendance Summary')
                     ->color('success')
                     ->form([
@@ -176,6 +177,7 @@ class AttendanceResource extends Resource
                         ]));
                     })
                     ->openUrlInNewTab()
+                    
             ])
             ->bulkActions([]);
 

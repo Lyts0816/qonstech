@@ -136,8 +136,10 @@ class PayrollController extends Controller
             $TotalOvertimeHours = 0;
             $TotalOvertimePay = 0;
             $DeductionFee = 0;
-            $TotalTardiness = 0;
+            
+
             $TotalUndertime = 0;
+            $TotalTardiness = 0;
 
             foreach ($finalAttendance as $attendances) {
                 // dd($attendances);
@@ -362,9 +364,9 @@ class PayrollController extends Controller
 
                             $newRecord['TotalTardiness'] = $TotalTardiness;
                             $newRecord['TotalUndertime'] = $TotalUndertime;
-                                                  $deduction = $employee->HourlyRate * ($TotalTardiness / 60);
+                            $deduction = $employee->HourlyRate * ($TotalTardiness / 60);
 
-                             $newRecord['TotalTardinessDed'] = $deduction;
+                            $newRecord['TotalTardinessDed'] = $deduction;
                             // * $employee->HourlyRate;
 
                             $UndertimetoHours = $TotalUndertime / 60;
@@ -388,6 +390,7 @@ class PayrollController extends Controller
 
             // Get the work schedule for the employee using the related schedule
             $GetWorkSched = \App\Models\WorkSched::where('ScheduleName', $employee['schedule']->ScheduleName)->first();
+            // dd($GetWorkSched);
 
             $totalOvertimeHours = 0;
 
@@ -693,6 +696,7 @@ class PayrollController extends Controller
             $newRecord['GrossPay'] = $GrossPay;
 
             // dd($TotalOvertimePay);
+            
 
             $taxableIncome = $GrossPay - ($SSSDeduction + $PhilHealthDeduction + $PagIbigDeduction);
             $withholdingTax = 0;
@@ -709,11 +713,10 @@ class PayrollController extends Controller
             $newRecord['WTAXDeduction'] = $taxDue;
 
 
-
             $TotalDeductions = $PagIbigDeduction + $SSSDeduction + $PhilHealthDeduction + $DeductionFee + $newRecord['SSSLoan'] + $newRecord['PagibigLoan'] + $newRecord['SalaryLoan'] + $newRecord['WTAXDeduction'] + $newRecord['TotalTardinessDed'] + $newRecord['TotalUndertimeDed'];
             $newRecord['TotalDeductions'] = $TotalDeductions;
 
-            // dd($newRecord['TotalTardinessDed']);
+           // dd($newRecord['TotalTardinessDed']);
 
             $TotalGovDeductions = $PagIbigDeduction + $SSSDeduction + $PhilHealthDeduction + $newRecord['WTAXDeduction'];
             $newRecord['TotalGovDeductions'] = $TotalGovDeductions;

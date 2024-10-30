@@ -65,54 +65,29 @@ class EmployeeResource extends Resource
 
                 Section::make('Address')
                 ->schema([
-                    Select::make('province')
-                            ->label('Province')
-                            ->required(fn (string $context) => $context === 'create' || 'edit')
-                            ->options([
-                            'Sarangani' => 'Sarangani',
-                            'South Cotabato' => 'South Cotabato',
-                            ])->native(false),
+                    TextInput::make('Province')
+                    ->label('Province')
+                    ->required(fn (string $context) => $context === 'create' || $context === 'edit')
+                    ->rules('regex:/^[^\d]*$/')
+                    ->maxLength(30),
 
-                    Select::make('city')
-                        ->label('City')
-                        ->required(fn (string $context) => $context === 'create' || 'edit')
-                        ->options([
-                            'Koronadal City' => 'Koronadal City',
-                            'Polomolok' => 'Polomolok',
-                            'Tupi' => 'Tupi',
-                            'Tantangan' => 'Tantangan',
-                            'Surallah' => 'Surallah',
-                            'Lake Sebu' => 'Lake Sebu',
-                            'Banga' => 'Banga',
-                            'Glan' => 'Glan'
-                        ])->native(false),
+                    TextInput::make('Municipality')
+                    ->label('Municipality')
+                    ->required(fn (string $context) => $context === 'create' || $context === 'edit')
+                    ->rules('regex:/^[^\d]*$/')
+                    ->maxLength(30),
 
-                    Select::make('barangay')
-                        ->label('Barangay')
-                        ->required(fn (string $context) => $context === 'create' || 'edit')
-                        ->options([
-                            'Barangay Zone III' => 'Barangay Zone III',
-                            'Cannery Site' => 'Cannery Site',
-                            'Poblacion' => 'Poblacion',
-                            'Crossing Rubber' => 'Crossing Rubber',
-                            'Liberty' => 'Liberty',
-                            'Lamian' => 'Lamian',
-                            'Rizal' => 'Rizal',
-                            'Gumasa' => 'Gumasa',
-                        ])->native(false),
+                    TextInput::make('Barangay')
+                    ->label('Barangay')
+                    ->required(fn (string $context) => $context === 'create' || $context === 'edit')
+                    ->rules('regex:/^[^\d]*$/')
+                    ->maxLength(30),
 
-                    Select::make('street')
-                        ->label('Street')
-                        ->required(fn (string $context) => $context === 'create' || 'edit')
-                        ->options([
-                            'Sanchez St.' => 'Sanchez St.',
-                            'Roxas St.' => 'Roxas St.',
-                            'GenSan Drive' => 'GenSan Drive',
-                            'Polomolok Road' => 'Polomolok Road',
-                            'Apolinario Mabini St.' => 'Apolinario Mabini St.',
-                            'Bonifacio St.' => 'Bonifacio St.',
-                            'Clemente Lapaz Street' => 'Clemente Lapaz Street',
-                        ])->native(false),
+                    TextInput::make('Street')
+                    ->label('Street')
+                    ->required(fn (string $context) => $context === 'create' || $context === 'edit')
+                    ->rules('regex:/^[^\d]*$/')
+                    ->maxLength(30),
                 ])->columns(4)->collapsible(true),
 
 								Section::make(heading: 'Employment Details')
