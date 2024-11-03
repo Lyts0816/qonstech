@@ -18,7 +18,7 @@ use PhpParser\Node\Stmt\Label;
 
 class SssResource extends Resource
 {
-    protected static ?string $model = sss::class;
+    protected static ?string $model = Sss::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
