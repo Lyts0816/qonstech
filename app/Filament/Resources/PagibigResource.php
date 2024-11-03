@@ -17,7 +17,7 @@ use Filament\Tables\Columns\TextColumn;
 
 class PagibigResource extends Resource
 {
-    protected static ?string $model = pagibig::class;
+    protected static ?string $model = Pagibig::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
