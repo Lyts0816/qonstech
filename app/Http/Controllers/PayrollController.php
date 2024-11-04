@@ -136,6 +136,7 @@ class PayrollController extends Controller
             $TotalOvertimeHours = 0;
             $TotalOvertimePay = 0;
             $DeductionFee = 0;
+            $TotalTardinessDed = 0;
             
 
             $TotalUndertime = 0;
