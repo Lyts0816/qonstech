@@ -212,7 +212,13 @@ class ListEmployees extends ListRecords
     public function getTabs(): array
     {
         return [
-            'All' => Tab::make(),
+            // 'All' => Tab::make(),
+
+            'activeEmployees' => Tab::make('Active Employees')
+            ->badge(Employee::whereNull('deleted_at')->count()) 
+            ->modifyQueryUsing(function ($query) {
+                $query->whereNull('deleted_at'); 
+            }),
 
             'Available' => Tab::make()->modifyQueryUsing(function ($query){
                 $query->where('status', 'Available');
@@ -228,6 +234,12 @@ class ListEmployees extends ListRecords
 
             'Main Office' => Tab::make()->modifyQueryUsing(function ($query){
                 $query->where('assignment', 'Main Office');
+            }),
+
+            'archive' => Tab::make('Deactivated Employees')
+            ->badge(Employee::onlyTrashed()->count())
+            ->modifyQueryUsing(function ($query) {
+                $query->onlyTrashed();
             }),
         ];
     }
