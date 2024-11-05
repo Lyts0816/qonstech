@@ -4,7 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\SssResource\Pages;
 use App\Filament\Resources\SssResource\RelationManagers;
-use App\Models\Sss;
+use App\Models\sss;
 use Filament\Forms;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\TextColumn;
@@ -18,7 +18,7 @@ use PhpParser\Node\Stmt\Label;
 
 class SssResource extends Resource
 {
-    protected static ?string $model = Sss::class;
+    protected static ?string $model = sss::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 

@@ -136,6 +136,7 @@ class PayrollController extends Controller
             $TotalOvertimeHours = 0;
             $TotalOvertimePay = 0;
             $DeductionFee = 0;
+            $TotalTardinessDed = 0;
             
 
             $TotalUndertime = 0;
@@ -551,9 +552,9 @@ class PayrollController extends Controller
 
 
 
-            $GetSSS = \App\Models\Sss::get();
+            $GetSSS = \App\Models\sss::get();
 
-            $GetPagibig = \App\Models\Pagibig::get();
+            $GetPagibig = \App\Models\pagibig::get();
 
             $GetPhilHealth = \App\Models\philhealth::get();
 
