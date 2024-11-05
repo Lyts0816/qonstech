@@ -235,7 +235,7 @@ class PayslipController extends Controller
                         $TotalUndertime += ($underTimeMorningMinutes > 0 ? $underTimeMorningMinutes : 0)
                             + ($underTimeAfternoonMinutes > 0 ? $underTimeAfternoonMinutes : 0);
 
-                            $newRecord['TotalTardiness'] = $TotalTardiness;
+                        $newRecord['TotalTardiness'] = $TotalTardiness;
                         $newRecord['TotalUndertime'] = $TotalUndertime;
 
 
@@ -789,7 +789,7 @@ class PayslipController extends Controller
 
 
 
-            $TotalDeductions = $PagIbigDeduction + $SSSDeduction + $PhilHealthDeduction + $DeductionFee + $newRecord['SSSLoan'] + $newRecord['PagibigLoan'] + $newRecord['SalaryLoan'] + $newRecord['WTAXDeduction'] + $newRecord['TotalTardinessDed'] + $newRecord['TotalUndertimeDed'];
+            $TotalDeductions = $PagIbigDeduction + $SSSDeduction + $PhilHealthDeduction + $DeductionFee + $newRecord['SSSLoan'] + $newRecord['PagibigLoan'] + $newRecord['SalaryLoan'] + $newRecord['WTAXDeduction'] + $TotalTardiness + $TotalUndertime;
             $newRecord['TotalDeductions'] = $TotalDeductions;
 
             $TotalGovDeductions = $PagIbigDeduction + $SSSDeduction + $PhilHealthDeduction;
