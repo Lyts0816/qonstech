@@ -183,8 +183,12 @@ class PayrollController extends Controller
                         $afternoonEnd = Carbon::createFromTime($Out2Array[0], $Out2Array[1], $Out2Array[2]);  // 5:00 PM
 
                         // Calculate morning shift times (ignoring seconds)
-                        $checkinOne = Carbon::createFromFormat('H:i', substr($attendances["Checkin_One"], 0, 5)) ?? Carbon::createFromTime(0, 0, 0);
-                        $checkoutOne = Carbon::createFromFormat('H:i', substr($attendances["Checkout_One"], 0, 5)) ?? Carbon::createFromTime(0, 0, 0);
+                        // $checkinOne = Carbon::createFromFormat('H:i', substr($attendances["Checkin_One"], 0, 5)) ?? Carbon::createFromTime(0, 0, 0);
+                        // $checkoutOne = Carbon::createFromFormat('H:i', substr($attendances["Checkout_One"], 0, 5)) ?? Carbon::createFromTime(0, 0, 0);
+
+                        $checkinOne = !empty($attendances["Checkin_One"]) && strlen($attendances["Checkin_One"]) >= 5 ? Carbon::createFromFormat('H:i', substr($attendances["Checkin_One"], 0, 5)) : Carbon::createFromTime(0, 0, 0);
+                            
+                        $checkoutOne = !empty($attendances["Checkout_One"]) && strlen($attendances["Checkout_One"]) >= 5 ? Carbon::createFromFormat('H:i', substr($attendances["Checkout_One"], 0, 5)) : Carbon::createFromTime(0, 0, 0);
 
                         // Calculate late time for the morning (in hours)
                         // $lateMorningHours = $checkinOne->greaterThan($morningStart) ? $checkinOne->diffInMinutes($morningEnd) / 60 : 0;
@@ -199,8 +203,12 @@ class PayrollController extends Controller
                         // $workedMorningHours = $checkinOne->diffInMinutes($checkoutOne) / 60;
 
                         // Calculate afternoon shift times (ignoring seconds)
-                        $checkinTwo = Carbon::createFromFormat('H:i', substr($attendances["Checkin_Two"], 0, 5)) ?? Carbon::createFromTime(0, 0, 0);
-                        $checkoutTwo = Carbon::createFromFormat('H:i', substr($attendances["Checkout_Two"], 0, 5)) ?? Carbon::createFromTime(0, 0, 0);
+                        // $checkinTwo = Carbon::createFromFormat('H:i', substr($attendances["Checkin_Two"], 0, 5)) ?? Carbon::createFromTime(0, 0, 0);
+                        // $checkoutTwo = Carbon::createFromFormat('H:i', substr($attendances["Checkout_Two"], 0, 5)) ?? Carbon::createFromTime(0, 0, 0);
+
+                        $checkinTwo = !empty($attendances["Checkin_Two"]) && strlen($attendances["Checkin_Two"]) >= 5 ? Carbon::createFromFormat('H:i', substr($attendances["Checkin_Two"], 0, 5)) : Carbon::createFromTime(0, 0, 0);
+                            
+                        $checkoutTwo = !empty($attendances["Checkout_Two"]) && strlen($attendances["Checkout_Two"]) >= 5 ? Carbon::createFromFormat('H:i', substr($attendances["Checkout_Two"], 0, 5)) : Carbon::createFromTime(0, 0, 0);
 
                         // Calculate late time for the afternoon (in hours)
                         $lateAfternoonHours = $checkinTwo->greaterThan($afternoonStart) ? $checkinTwo->diffInMinutes($afternoonEnd) / 60 : 0;
@@ -252,9 +260,12 @@ class PayrollController extends Controller
                             $morningEnd = Carbon::createFromTime($Out1Array[0], $Out1Array[1], $Out1Array[2]);  // 12:00 PM
                             $afternoonStart = Carbon::createFromTime($In2Array[0], $In2Array[1], $In2Array[2]); // 1:00 PM
                             $afternoonEnd = Carbon::createFromTime($Out2Array[0], $Out2Array[1], $Out2Array[2]);  // 5:00 PM
+                            
+                            $checkinOne = !empty($attendances["Checkin_One"]) && strlen($attendances["Checkin_One"]) >= 5 ? Carbon::createFromFormat('H:i', substr($attendances["Checkin_One"], 0, 5)) : Carbon::createFromTime(0, 0, 0);
+                            
+                            $checkoutOne = !empty($attendances["Checkout_One"]) && strlen($attendances["Checkout_One"]) >= 5 ? Carbon::createFromFormat('H:i', substr($attendances["Checkout_One"], 0, 5)) : Carbon::createFromTime(0, 0, 0);
 
-                            $checkinOne = Carbon::createFromFormat('H:i', substr($attendances["Checkin_One"], 0, 5)) ?? Carbon::createFromTime(0, 0, 0);
-                            $checkoutOne = Carbon::createFromFormat('H:i', substr($attendances["Checkout_One"], 0, 5)) ?? Carbon::createFromTime(0, 0, 0);
+                            
 
                             // $lateMorningHours = $checkinOne->greaterThan($morningStart) ? $checkinOne->diffInMinutes($morningEnd) / 60 : 0;
 
@@ -266,8 +277,10 @@ class PayrollController extends Controller
                             $workedMorningHours = $workedMorningMinutes / 60;
                             // $workedMorningHours = $checkinOne->diffInMinutes($checkoutOne) / 60;
 
-                            $checkinTwo = Carbon::createFromFormat('H:i', substr($attendances["Checkin_Two"], 0, 5)) ?? Carbon::createFromTime(0, 0, 0);
-                            $checkoutTwo = Carbon::createFromFormat('H:i', substr($attendances["Checkout_Two"], 0, 5)) ?? Carbon::createFromTime(0, 0, 0);
+                            
+                            $checkinTwo = !empty($attendances["Checkin_Two"]) && strlen($attendances["Checkin_Two"]) >= 5 ? Carbon::createFromFormat('H:i', substr($attendances["Checkin_Two"], 0, 5)) : Carbon::createFromTime(0, 0, 0);
+                            
+                            $checkoutTwo = !empty($attendances["Checkout_Two"]) && strlen($attendances["Checkout_Two"]) >= 5 ? Carbon::createFromFormat('H:i', substr($attendances["Checkout_Two"], 0, 5)) : Carbon::createFromTime(0, 0, 0);
 
                             // $lateAfternoonHours = $checkinTwo->greaterThan($afternoonStart) ? $checkinTwo->diffInMinutes($afternoonEnd) / 60 : 0;
 
@@ -325,7 +338,9 @@ class PayrollController extends Controller
                             $afternoonEnd = Carbon::createFromTime($Out2Array[0], $Out2Array[1], $Out2Array[2]);  // 5:00 PM
 
                             $checkinOne = !empty($attendances["Checkin_One"]) && strlen($attendances["Checkin_One"]) >= 5 ? Carbon::createFromFormat('H:i', substr($attendances["Checkin_One"], 0, 5)) : Carbon::createFromTime(0, 0, 0);
-                            $checkoutOne = Carbon::createFromFormat('H:i', substr($attendances["Checkout_One"], 0, 5)) ?? Carbon::createFromTime(0, 0, 0);
+                            
+                            $checkoutOne = !empty($attendances["Checkout_One"]) && strlen($attendances["Checkout_One"]) >= 5 ? Carbon::createFromFormat('H:i', substr($attendances["Checkout_One"], 0, 5)) : Carbon::createFromTime(0, 0, 0);
+                            
 
                             // $lateMorningHours = $checkinOne->greaterThan($morningStart) ? $checkinOne->diffInMinutes($morningStart) / 60 : 0;
 
@@ -337,8 +352,10 @@ class PayrollController extends Controller
                             $workedMorningHours = $workedMorningMinutes / 60;
                             // $workedMorningHours = $checkinOne->diffInMinutes($morningEnd) / 60;
 
-                            $checkinTwo = Carbon::createFromFormat('H:i', substr($attendances["Checkin_Two"], 0, 5)) ?? Carbon::createFromTime(0, 0, 0);
-                            $checkoutTwo = Carbon::createFromFormat('H:i', substr($attendances["Checkout_Two"], 0, 5)) ?? Carbon::createFromTime(0, 0, 0);
+
+                            $checkinTwo = !empty($attendances["Checkin_Two"]) && strlen($attendances["Checkin_Two"]) >= 5 ? Carbon::createFromFormat('H:i', substr($attendances["Checkin_Two"], 0, 5)) : Carbon::createFromTime(0, 0, 0);
+                            
+                            $checkoutTwo = !empty($attendances["Checkout_Two"]) && strlen($attendances["Checkout_Two"]) >= 5 ? Carbon::createFromFormat('H:i', substr($attendances["Checkout_Two"], 0, 5)) : Carbon::createFromTime(0, 0, 0);
 
                             // $lateAfternoonHours = $checkinTwo->greaterThan($afternoonStart) ? $checkinTwo->diffInMinutes($afternoonEnd) / 60 : 0;
 
