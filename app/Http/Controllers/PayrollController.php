@@ -731,7 +731,7 @@ class PayrollController extends Controller
             $newRecord['WTAXDeduction'] = $taxDue;
 
 
-            $TotalDeductions = $PagIbigDeduction + $SSSDeduction + $PhilHealthDeduction + $DeductionFee + $newRecord['SSSLoan'] + $newRecord['PagibigLoan'] + $newRecord['SalaryLoan'] + $newRecord['WTAXDeduction'] + $newRecord['TotalTardinessDed'] + $newRecord['TotalUndertimeDed'];
+            $TotalDeductions = $PagIbigDeduction + $SSSDeduction + $PhilHealthDeduction + $DeductionFee + $newRecord['SSSLoan'] + $newRecord['PagibigLoan'] + $newRecord['SalaryLoan'] + $newRecord['WTAXDeduction'] + $TotalTardiness + $TotalUndertime;
             $newRecord['TotalDeductions'] = $TotalDeductions;
 
            // dd($newRecord['TotalTardinessDed']);
