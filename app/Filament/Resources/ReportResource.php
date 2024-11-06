@@ -391,7 +391,7 @@ class ReportResource extends Resource
                     ->visible(fn($record) => $record->ReportType != 'Payslip'),
 
 
-                // Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
                 // Tables\Actions\BulkActionGroup::make([

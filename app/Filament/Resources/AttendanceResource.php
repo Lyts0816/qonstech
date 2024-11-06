@@ -116,9 +116,14 @@ class AttendanceResource extends Resource
                                 ->default(now()->startOfMonth()->toDateString())
                         ])
                         ->query(
-                            fn(Builder $query, $data) =>
-                            !empty ($data['start_date']) ?
-                            $query->where('Date', '>=', $data['start_date']) : null
+                            function(Builder $query, $data){
+															if(!empty ($data['start_date'])) {
+																Session::put('startDate', $data['start_date']);
+																$query->whereBetween('Date', [$data['start_date'], Session::get('endDate')]);
+																// $query->where('Date', '>=', $data['start_date']);
+															}
+															return $query;
+														}
                         ),
 
                     Filter::make('end_date')
@@ -129,9 +134,14 @@ class AttendanceResource extends Resource
                                 ->default(now()->endOfMonth()->toDateString())
                         ])
                         ->query(
-                            fn(Builder $query, $data) =>
-                            !empty ($data['end_date']) ?
-                            $query->where('Date', '<=', $data['end_date']) : null
+                            function(Builder $query, $data){
+															if(!empty ($data['end_date'])) {
+																Session::put('endDate', $data['end_date']);
+																$query->whereBetween('Date', [Session::get('startDate'), $data['end_date']]);
+																// $query->where('Date', '>=', $data['end_date']);
+															}
+															return $query;
+														}
                         ),
 
                 ],
@@ -145,6 +155,8 @@ class AttendanceResource extends Resource
                     ->color('primary')
                     ->url(fn() => route('dtr.show', [
                         'employee_id' => Session::get('selected_employee_id'),
+                        'startDate' => Session::get('startDate'),
+                        'endDate' => Session::get('endDate'),
                         // 'project_id' => Session::get('selected_project_id'),
                     ]))
                     ->openUrlInNewTab(),
