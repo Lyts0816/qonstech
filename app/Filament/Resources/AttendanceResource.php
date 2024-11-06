@@ -86,27 +86,27 @@ class AttendanceResource extends Resource
                             }
                         ),
 
-                    // Filter::make('project_filter')
-                    //     ->form([
-                    //         Forms\Components\Grid::make()
-                    //             ->schema([
-                    //                 Forms\Components\Select::make('selectedProjectId')
-                    //                     ->label('Select Project')
-                    //                     ->options(Project::all()->pluck('ProjectName', 'id'))
-                    //                     ->extraAttributes(['class' => 'h-12 text-lg', 'style' => 'width: 100%;'])
-                    //                     ->required(),
-                    //             ])
-                    //             ->columns(1),
-                    //     ])
-                    //     ->query(
-                    //         function (Builder $query, array $data) {
-                    //             if (!empty($data['selectedProjectId'])) {
-                    //                 Session::put('selected_project_id', $data['selectedProjectId']);
-                    //                 $query->where('ProjectID', $data['selectedProjectId']); // Make sure to use project_id for filtering
-                    //             }
-                    //             return $query;
-                    //         }
-                    //     ),
+                    Filter::make('project_filter')
+                        ->form([
+                            Forms\Components\Grid::make()
+                                ->schema([
+                                    Forms\Components\Select::make('selectedProjectId')
+                                        ->label('Select Project')
+                                        ->options(Project::all()->pluck('ProjectName', 'id'))
+                                        ->extraAttributes(['class' => 'h-12 text-lg', 'style' => 'width: 100%;'])
+                                        ->required(),
+                                ])
+                                ->columns(1),
+                        ])
+                        ->query(
+                            function (Builder $query, array $data) {
+                                if (!empty($data['selectedProjectId'])) {
+                                    Session::put('selected_project_id', $data['selectedProjectId']);
+                                    $query->where('ProjectID', $data['selectedProjectId']); // Make sure to use project_id for filtering
+                                }
+                                return $query;
+                            }
+                        ),
 
                     Filter::make('start_date')
                         ->form([
@@ -119,7 +119,8 @@ class AttendanceResource extends Resource
                             function(Builder $query, $data){
 															if(!empty ($data['start_date'])) {
 																Session::put('startDate', $data['start_date']);
-																$query->where('Date', '>=', $data['start_date']);
+																$query->whereBetween('Date', [$data['start_date'], Session::get('endDate')]);
+																// $query->where('Date', '>=', $data['start_date']);
 															}
 															return $query;
 														}
@@ -136,7 +137,8 @@ class AttendanceResource extends Resource
                             function(Builder $query, $data){
 															if(!empty ($data['end_date'])) {
 																Session::put('endDate', $data['end_date']);
-																$query->where('Date', '>=', $data['end_date']);
+																$query->whereBetween('Date', [Session::get('startDate'), $data['end_date']]);
+																// $query->where('Date', '>=', $data['end_date']);
 															}
 															return $query;
 														}
