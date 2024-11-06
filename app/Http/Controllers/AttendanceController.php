@@ -35,7 +35,7 @@ class AttendanceController extends Controller
 				->orderBy('Date', 'asc')
 				->get();
 
-				dd($data);
+				// dd($data);
 
 			if (count($data) > 0) {
 				$TotalHours = 0;
