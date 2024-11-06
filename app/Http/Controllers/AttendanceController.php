@@ -18,8 +18,9 @@ class AttendanceController extends Controller
 			// Get the employee ID from the query parameters
 			$employeeId = $request->query('employee_id');
 			$projectId = $request->query('project_id');
+			$startDate = $request->query('startDate');
+			$endDate = $request->query('endDate');
 
-			
 			$dompdf = new Dompdf();
 			// Render each employee's payslip
 			$payslipHtml = '';
@@ -32,6 +33,7 @@ class AttendanceController extends Controller
 			// Example: replace with your actual DTR fetching logic
 			$data = Attendance::where('employee_id', $employeeId)
 				->where('ProjectID', $projectId)
+				->whereBetween('Date', [$startDate, $endDate])
 				->orderBy('Date', 'asc')
 				->get();
 
