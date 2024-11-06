@@ -239,20 +239,32 @@ class PayrollResource extends Resource
 					->sortable(),
 
 			])
+			->defaultSort('created_at', 'desc') // Order by latest added record
 			->recordUrl(function ($record) {
                 return null;
             })
 			->filters([
-				SelectFilter::make('project_id')
+				// SelectFilter::make('project_id')
+				// 	->label('Select Project')
+				// 	->options(Project::all()->pluck('ProjectName', 'id'))
+				// 	->query(function (Builder $query, array $data) {
+				// 		if (empty($data['value'])) {
+				// 			return $query;
+				// 		}
+				// 		return $query->whereHas('employee.project', function (Builder $query) use ($data) {
+				// 			$query->where('id', $data['value']);
+				// 		});
+				// 	}),
+
+					SelectFilter::make('project_id')
 					->label('Select Project')
 					->options(Project::all()->pluck('ProjectName', 'id'))
-					->query(function (Builder $query, array $data) {
-						if (empty($data['value'])) {
-							return $query;
+					->query(function (Builder $query, $value) {
+						if ($value) {
+							$query->whereHas('project', function (Builder $query) use ($value) {
+								$query->where('id', $value);
+							});
 						}
-						return $query->whereHas('employee.project', function (Builder $query) use ($data) {
-							$query->where('id', $data['value']);
-						});
 					}),
 
 				// SelectFilter::make('projectName')
