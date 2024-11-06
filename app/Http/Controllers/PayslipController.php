@@ -13,7 +13,7 @@ class PayslipController extends Controller
 
     public function generatePayslips(Request $request)
     {
-        // dd($request);
+        // dd($request->record);
         // Initialize Dompdf instance
 
 
@@ -23,29 +23,30 @@ class PayslipController extends Controller
 
 
 
-        $employeesWPosition = \App\Models\Employee::where('employment_type', $request->EmployeeStatus)
+        $employeesWPosition = \App\Models\Employee::where('employment_type', $request->record['EmployeeStatus'])
             ->join('positions', 'employees.position_id', '=', 'positions.id')
             ->select('employees.*', 'positions.PositionName', 'positions.MonthlySalary', 'positions.HourlyRate'); // Only select needed fields
-        $validator = Validator::make($request->all(), [
-            'EmployeeStatus' => 'required|string',
-            'assignment' => 'required|string',
-            'ProjectID' => 'nullable|string|integer', // Adjust according to your requirement
-        ]);
+        // $validator = Validator::make($request->all(), [
+        //     'EmployeeStatus' => 'required|string',
+        //     'assignment' => 'required|string',
+        //     'ProjectID' => 'nullable|string|integer', // Adjust according to your requirement
+        // ]);
 
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
-        }
+        // if ($validator->fails()) {
+        //     return response()->json($validator->errors(), 422);
+        // }
 
         // Query for employees with their position
-        $employeesWPosition = \App\Models\Employee::where('employment_type', $request->EmployeeStatus)
+        $employeesWPosition = \App\Models\Employee::where('employment_type', $request->record['EmployeeStatus'])
             ->join('positions', 'employees.position_id', '=', 'positions.id')
             ->select('employees.*', 'positions.PositionName', 'positions.MonthlySalary', 'positions.HourlyRate');
 
+
         // Check if the assignment is project-based
-        if ($request->assignment === 'Project Based') {
+        if ( $request->record['assignment'] === 'Project Based') {
             // If project-based, filter by project
             $employeesWPosition = $employeesWPosition->whereNotNull('project_id') // Ensure the employee has a project
-                ->where('project_id', $request->ProjectID); // Filter by specific project
+                ->where('project_id', $request->record['ProjectID']); // Filter by specific project
         } else {
             // If not project-based, filter employees without a project
             $employeesWPosition = $employeesWPosition->whereNull('project_id'); // Ensure the employee does not have a project
@@ -59,6 +60,7 @@ class PayslipController extends Controller
         $payrollRecords = collect();
 
         foreach ($employeesWPosition as $employee) {
+            // dd( $employee);
             $newRecord = $request->all();
             $newRecord['EmployeeID'] = $employee->id;
             $newRecord['first_name'] = $employee->first_name;
@@ -67,7 +69,10 @@ class PayslipController extends Controller
             $newRecord['position'] = $employee->PositionName;
             $newRecord['monthlySalary'] = $employee->MonthlySalary;
             $newRecord['hourlyRate'] = $employee->HourlyRate;
+            $newRecord['EmployeeStatus'] = $employee->employment_type;
             $newRecord['SalaryType'] = 'OPEN';
+            $newRecord['TotalTardinessDed'] = 0;
+            $newRecord['TotalUndertimeDed'] = 0;
             $newRecord['RegularStatus'] = $employee->employment_type == 'Regular' ? 'YES' : 'NO';
             // Check if the employee has a project_id
             if ($employee->project_id) {
@@ -86,7 +91,7 @@ class PayslipController extends Controller
 
 
             // Check if payroll frequency is Kinsenas or Weekly
-            $weekPeriod = \App\Models\WeekPeriod::where('id', $request->weekPeriodID)->first();
+            $weekPeriod = \App\Models\WeekPeriod::where('id', $request->record['weekPeriodID'])->first();
             $newRecord['Period'] = $weekPeriod->StartDate . ' - ' . $weekPeriod->EndDate;
 
             // dd($newRecord['ProjectName'], $newRecord['Period']);
@@ -242,6 +247,7 @@ class PayslipController extends Controller
                         $deduction = $employee->HourlyRate * ($TotalTardiness / 60);
 
                         $newRecord['TotalTardinessDed'] = $deduction;
+                       
                         // * $employee->HourlyRate;
                         $UndertimetoHours = $TotalUndertime / 60;
 
@@ -375,6 +381,7 @@ class PayslipController extends Controller
                                 $deduction = $employee->HourlyRate * ($TotalTardiness / 60);
         
                                 $newRecord['TotalTardinessDed'] = $deduction;
+                                dd( $newRecord);
                                 // * $employee->HourlyRate;
                                 $UndertimetoHours = $TotalUndertime / 60;
         
@@ -470,7 +477,7 @@ class PayslipController extends Controller
 
 
             // For Earnings
-            $GetEarnings = \App\Models\Earnings::where('PeriodID', $request->weekPeriodID)
+            $GetEarnings = \App\Models\Earnings::where('PeriodID', $request->record['weekPeriodID'])
                 ->where('EmployeeID', $employee->id)
                 ->get();
             $Earnings = $GetEarnings;
@@ -483,7 +490,7 @@ class PayslipController extends Controller
 
 
             // For Deductions
-            $GetDeductions = \App\Models\Deduction::where('PeriodID', $request->weekPeriodID)
+            $GetDeductions = \App\Models\Deduction::where('PeriodID', $request->record['weekPeriodID'])
                 ->where('EmployeeID', $employee->id)
                 ->get();
             $Deductions = $GetDeductions;
@@ -496,11 +503,11 @@ class PayslipController extends Controller
 
             // Get the loan for the employee and period
             $loan = \App\Models\Loan::where('EmployeeID', $employee->id)
-                ->where('PeriodID', $request->weekPeriodID)
+                ->where('PeriodID', $request->record['weekPeriodID'])
                 ->first();
             if ($loan) {
                 // Check if payroll is already generated for this period and employee
-                $existingPayroll = \App\Models\Payroll::where('weekPeriodID', $request->weekPeriodID)
+                $existingPayroll = \App\Models\Payroll::where('weekPeriodID', $request->record['weekPeriodID'])
                     ->exists();
                 if ($existingPayroll) {
                     $newDeduction = new \App\Models\Deduction();
@@ -578,7 +585,7 @@ class PayslipController extends Controller
             foreach ($loans as $loan) {
                 // Get loan details for the specific week period
                 $loanDetails = LoanDtl::where('LoanID', $loan->id) // Assuming LoanID is the foreign key in LoanDetail
-                    ->where('PeriodID', $request->weekPeriodID)
+                    ->where('PeriodID', $request->record['weekPeriodID'])
                     ->get();
 
                 // Initialize deduction amount for this loan type
@@ -633,7 +640,7 @@ class PayslipController extends Controller
             $GetPhilHealth = \App\Models\philhealth::get();
 
             $GetWTAX = \App\Models\Tax::get();
-            // $weekPeriod = \App\Models\WeekPeriod::where('id', $request->weekPeriodID)->first();
+            // $weekPeriod = \App\Models\WeekPeriod::where('id', $request->record['weekPeriodID'])->first();
 
             if ($weekPeriod) {
                 // For Kinsenas (1st Kinsena or 2nd Kinsena)
@@ -784,10 +791,6 @@ class PayslipController extends Controller
 
             // Update WTAXDeduction in payroll calculation
             $newRecord['WTAXDeduction'] = $taxDue;
-
-
-
-
 
             $TotalDeductions = $PagIbigDeduction + $SSSDeduction + $PhilHealthDeduction + $DeductionFee + $newRecord['SSSLoan'] + $newRecord['PagibigLoan'] + $newRecord['SalaryLoan'] + $newRecord['WTAXDeduction'] + $newRecord['TotalTardinessDed'] + $newRecord['TotalUndertimeDed'];
             $newRecord['TotalDeductions'] = $TotalDeductions;
