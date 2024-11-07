@@ -381,7 +381,7 @@ class PayslipController extends Controller
                                 $deduction = $employee->HourlyRate * ($TotalTardiness / 60);
         
                                 $newRecord['TotalTardinessDed'] = $deduction;
-                                dd( $newRecord);
+                                // dd( $newRecord);
                                 // * $employee->HourlyRate;
                                 $UndertimetoHours = $TotalUndertime / 60;
         
