@@ -125,9 +125,9 @@ class DeductionResource extends Resource
 
                 Tables\Actions\DeleteAction::make()->label('Deactivate')
                 ->modalSubmitActionLabel('Deactivate')
-                ->modalHeading('Deactivate Holiday')
+                ->modalHeading('Deactivate Deduction')
                 ->hidden(fn($record) => $record->trashed())
-                ->successNotificationTitle('Holiday Deactivated'),
+                ->successNotificationTitle('Deduction Deactivated'),
 
                 Tables\Actions\ForceDeleteAction::make(),
                 Tables\Actions\RestoreAction::make(),
