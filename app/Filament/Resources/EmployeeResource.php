@@ -65,25 +65,25 @@ class EmployeeResource extends Resource
 
                 Section::make('Address')
                 ->schema([
-                    TextInput::make('Province')
+                    TextInput::make('province')
                     ->label('Province')
                     ->required(fn (string $context) => $context === 'create' || $context === 'edit')
                     ->rules('regex:/^[^\d]*$/')
                     ->maxLength(30),
 
-                    TextInput::make('Municipality')
+                    TextInput::make('city')
                     ->label('Municipality')
                     ->required(fn (string $context) => $context === 'create' || $context === 'edit')
                     ->rules('regex:/^[^\d]*$/')
                     ->maxLength(30),
 
-                    TextInput::make('Barangay')
+                    TextInput::make('barangay')
                     ->label('Barangay')
                     ->required(fn (string $context) => $context === 'create' || $context === 'edit')
                     ->rules('regex:/^[^\d]*$/')
                     ->maxLength(30),
 
-                    TextInput::make('Street')
+                    TextInput::make('street')
                     ->label('Street')
                     ->required(fn (string $context) => $context === 'create' || $context === 'edit')
                     ->rules('regex:/^[^\d]*$/')
