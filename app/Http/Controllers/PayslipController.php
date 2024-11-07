@@ -13,7 +13,7 @@ class PayslipController extends Controller
 
     public function generatePayslips(Request $request)
     {
-        // dd($request->record);
+        dd($request);
         // Initialize Dompdf instance
 
 
