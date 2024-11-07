@@ -4,7 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\SssResource\Pages;
 use App\Filament\Resources\SssResource\RelationManagers;
-use App\Models\Sss;
+use App\Models\sss;
 use Filament\Forms;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\TextColumn;
