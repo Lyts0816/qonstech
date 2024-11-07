@@ -288,7 +288,7 @@ class ReportResource extends Resource
                             ->placeholder('Select the payroll period')
                             ->visible(function (callable $get) {
                                 // Display if SelectPayroll has a value
-                                return !empty($get('SelectPayroll') &&  $get('ReportType') === 'Payslip');
+                                return !empty($get('SelectPayroll') && $get('ReportType') === 'Payslip');
                             }),
                     ])
             ]);
@@ -347,6 +347,7 @@ class ReportResource extends Resource
                                 if ($projectID) {
                                     // Fetch employees associated with the selected project and concatenate first_name and last_name
                                     $employees = \App\Models\Employee::where('project_id', $projectID)
+                                        ->where('employment_type', $EmployeeStatus)
                                         ->get()
                                         ->mapWithKeys(function ($employee) {
                                         return [$employee->id => "{$employee->first_name} {$employee->last_name}"];
@@ -354,16 +355,15 @@ class ReportResource extends Resource
 
                                     // Add "All Employees in this Project" option
                                     return ['All' => 'All Employees'] + $employees->toArray();
-                                } 
-                                else {
+                                } else {
                                     $employees = \App\Models\Employee::where('employment_type', $EmployeeStatus)
-                                    ->get()
-                                    ->mapWithKeys(function ($employee) {
-                                    return [$employee->id => "{$employee->first_name} {$employee->last_name}"];
-                                });
+                                        ->get()
+                                        ->mapWithKeys(function ($employee) {
+                                            return [$employee->id => "{$employee->first_name} {$employee->last_name}"];
+                                        });
 
-                                // Add "All Employees in this Project" option
-                                return ['All' => 'All Employees'] + $employees->toArray();
+                                    // Add "All Employees in this Project" option
+                                    return ['All' => 'All Employees'] + $employees->toArray();
                                 }
                                 return []; // Return empty if no projectID
                             })
@@ -394,10 +394,10 @@ class ReportResource extends Resource
                 // Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
-                // Tables\Actions\BulkActionGroup::make([
-                //     Tables\Actions\DeleteBulkAction::make(),
-                // ]),
-            ]);
+                    // Tables\Actions\BulkActionGroup::make([
+                    //     Tables\Actions\DeleteBulkAction::make(),
+                    // ]),
+                ]);
     }
 
     public static function getRelations(): array
