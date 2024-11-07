@@ -103,7 +103,10 @@ class AttendanceResource extends Resource
                                 if (!empty($data['selectedProjectId'])) {
                                     Session::put('selected_project_id', $data['selectedProjectId']);
                                     $query->where('ProjectID', $data['selectedProjectId']); // Make sure to use project_id for filtering
-                                }
+                                } else {
+																		$query->whereNull('ProjectID'); // Make sure to use project_id for filtering
+																		Session::put('selected_project_id', null);
+																}
                                 return $query;
                             }
                         ),
@@ -157,7 +160,7 @@ class AttendanceResource extends Resource
                         'employee_id' => Session::get('selected_employee_id'),
                         'startDate' => Session::get('startDate'),
                         'endDate' => Session::get('endDate'),
-                        // 'project_id' => Session::get('selected_project_id'),
+                        'project_id' => Session::get('selected_project_id'),
                     ]))
                     ->openUrlInNewTab(),
                 Action::make('viewSummary')
