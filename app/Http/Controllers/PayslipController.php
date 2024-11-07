@@ -13,7 +13,7 @@ class PayslipController extends Controller
 
     public function generatePayslips(Request $request)
     {
-        dd($request);
+        // dd($request);
         // Initialize Dompdf instance
 
 
@@ -23,9 +23,9 @@ class PayslipController extends Controller
 
 
 
-        $employeesWPosition = \App\Models\Employee::where('employment_type', $request->record['EmployeeStatus'])
-            ->join('positions', 'employees.position_id', '=', 'positions.id')
-            ->select('employees.*', 'positions.PositionName', 'positions.MonthlySalary', 'positions.HourlyRate'); // Only select needed fields
+        // $employeesWPosition = \App\Models\Employee::where('employment_type', $request->record['EmployeeStatus'])
+        //     ->join('positions', 'employees.position_id', '=', 'positions.id')
+        //     ->select('employees.*', 'positions.PositionName', 'positions.MonthlySalary', 'positions.HourlyRate'); // Only select needed fields
         // $validator = Validator::make($request->all(), [
         //     'EmployeeStatus' => 'required|string',
         //     'assignment' => 'required|string',
