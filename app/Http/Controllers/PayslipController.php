@@ -37,19 +37,27 @@ class PayslipController extends Controller
         // }
 
         // Query for employees with their position
-        $employeesWPosition = \App\Models\Employee::where('employment_type', $request->record['EmployeeStatus'])
-            ->join('positions', 'employees.position_id', '=', 'positions.id')
-            ->select('employees.*', 'positions.PositionName', 'positions.MonthlySalary', 'positions.HourlyRate');
+        if ($request['employee_id'] == 'All') {
+            $employeesWPosition = \App\Models\Employee::where('employment_type', $request->record['EmployeeStatus'])
+                ->join('positions', 'employees.position_id', '=', 'positions.id')
+                ->select('employees.*', 'positions.PositionName', 'positions.MonthlySalary', 'positions.HourlyRate');
+        } else {
+            $employeesWPosition = \App\Models\Employee::where('employment_type', $request->record['EmployeeStatus'])
+                ->where('employees.id', $request['employee_id'])
+                ->join('positions', 'employees.position_id', '=', 'positions.id')
+                ->select('employees.*', 'positions.PositionName', 'positions.MonthlySalary', 'positions.HourlyRate');
+        }
+
 
 
         // Check if the assignment is project-based
-        if ( $request->record['assignment'] === 'Project Based') {
+        if ($request->record['assignment'] === 'Project Based') {
             // If project-based, filter by project
             $employeesWPosition = $employeesWPosition->whereNotNull('project_id') // Ensure the employee has a project
-                ->where('project_id', $request->record['ProjectID']); // Filter by specific project
+                ->where('project_id', $request->record['ProjectID']);
         } else {
             // If not project-based, filter employees without a project
-            $employeesWPosition = $employeesWPosition->whereNull('project_id'); // Ensure the employee does not have a project
+            $employeesWPosition = $employeesWPosition->whereNull('project_id');
         }
         // dd($employeesWPosition->get());
         // Execute the query and get results
@@ -58,9 +66,9 @@ class PayslipController extends Controller
 
 
         $payrollRecords = collect();
-
+        // dd($employeesWPosition);
         foreach ($employeesWPosition as $employee) {
-            // dd( $employee);
+
             $newRecord = $request->all();
             $newRecord['EmployeeID'] = $employee->id;
             $newRecord['first_name'] = $employee->first_name;
@@ -71,8 +79,6 @@ class PayslipController extends Controller
             $newRecord['hourlyRate'] = $employee->HourlyRate;
             $newRecord['EmployeeStatus'] = $employee->employment_type;
             $newRecord['SalaryType'] = 'OPEN';
-            $newRecord['TotalTardinessDed'] = 0;
-            $newRecord['TotalUndertimeDed'] = 0;
             $newRecord['RegularStatus'] = $employee->employment_type == 'Regular' ? 'YES' : 'NO';
             // Check if the employee has a project_id
             if ($employee->project_id) {
@@ -150,6 +156,8 @@ class PayslipController extends Controller
             $TotalOvertimeHours = 0;
             $TotalOvertimePay = 0;
             $TotalTardiness = 0;
+            $TotalTardinessDed = 0;
+            $TotalUndertimeDed = 0;
             $TotalUndertime = 0;
             $DeductionFee = 0;
 
@@ -240,18 +248,18 @@ class PayslipController extends Controller
                         $TotalUndertime += ($underTimeMorningMinutes > 0 ? $underTimeMorningMinutes : 0)
                             + ($underTimeAfternoonMinutes > 0 ? $underTimeAfternoonMinutes : 0);
 
-                            $newRecord['TotalTardiness'] = $TotalTardiness;
+                        $newRecord['TotalTardiness'] = $TotalTardiness;
                         $newRecord['TotalUndertime'] = $TotalUndertime;
 
 
                         $deduction = $employee->HourlyRate * ($TotalTardiness / 60);
 
                         $newRecord['TotalTardinessDed'] = $deduction;
-                       
+
                         // * $employee->HourlyRate;
                         $UndertimetoHours = $TotalUndertime / 60;
 
-                            $newRecord['TotalUndertimeDed'] = $employee->HourlyRate * $UndertimetoHours;
+                        $newRecord['TotalUndertimeDed'] = $employee->HourlyRate * $UndertimetoHours;
                     } else { // regular day monday to saturday
                         // If date is Holiday
                         // dd(count(value: $Holiday));
@@ -313,15 +321,15 @@ class PayslipController extends Controller
                             $TotalUndertime += ($underTimeMorningMinutes > 0 ? $underTimeMorningMinutes : 0)
                                 + ($underTimeAfternoonMinutes > 0 ? $underTimeAfternoonMinutes : 0);
 
-                                $newRecord['TotalTardiness'] = $TotalTardiness;
-                        $newRecord['TotalUndertime'] = $TotalUndertime;
+                            $newRecord['TotalTardiness'] = $TotalTardiness;
+                            $newRecord['TotalUndertime'] = $TotalUndertime;
 
 
-                        $deduction = $employee->HourlyRate * ($TotalTardiness / 60);
+                            $deduction = $employee->HourlyRate * ($TotalTardiness / 60);
 
-                        $newRecord['TotalTardinessDed'] = $deduction;
-                        // * $employee->HourlyRate;
-                        $UndertimetoHours = $TotalUndertime / 60;
+                            $newRecord['TotalTardinessDed'] = $deduction;
+                            // * $employee->HourlyRate;
+                            $UndertimetoHours = $TotalUndertime / 60;
 
                             $newRecord['TotalUndertimeDed'] = $employee->HourlyRate * $UndertimetoHours;
                             // else {
@@ -374,18 +382,18 @@ class PayslipController extends Controller
                             $TotalUndertime += ($underTimeMorningMinutes > 0 ? $underTimeMorningMinutes : 0)
                                 + ($underTimeAfternoonMinutes > 0 ? $underTimeAfternoonMinutes : 0);
 
-                                $newRecord['TotalTardiness'] = $TotalTardiness;
-                                $newRecord['TotalUndertime'] = $TotalUndertime;
-        
-        
-                                $deduction = $employee->HourlyRate * ($TotalTardiness / 60);
-        
-                                $newRecord['TotalTardinessDed'] = $deduction;
-                                // dd( $newRecord);
-                                // * $employee->HourlyRate;
-                                $UndertimetoHours = $TotalUndertime / 60;
-        
-                                    $newRecord['TotalUndertimeDed'] = $employee->HourlyRate * $UndertimetoHours;
+                            $newRecord['TotalTardiness'] = $TotalTardiness;
+                            $newRecord['TotalUndertime'] = $TotalUndertime;
+
+
+                            $deduction = $employee->HourlyRate * ($TotalTardiness / 60);
+
+                            $newRecord['TotalTardinessDed'] = $deduction;
+                            // dd( $newRecord);
+                            // * $employee->HourlyRate;
+                            $UndertimetoHours = $TotalUndertime / 60;
+
+                            $newRecord['TotalUndertimeDed'] = $employee->HourlyRate * $UndertimetoHours;
                         }
                     }
                 }
@@ -426,7 +434,7 @@ class PayslipController extends Controller
                         // Calculate overtime if attendance is outside regular work hours and there is an approved overtime schedule
                         $overtimeHoursForDay = 0;
                         $totalOvertimeHours = 2.5;
-                        
+
                         // Check if check-in is before regular work hours
                         if ($attendanceCheckin->lt($workStart)) {
                             $overtimeMinutesBefore = $attendanceCheckin->diffInMinutes($workStart);
@@ -577,9 +585,9 @@ class PayslipController extends Controller
             // Initialize new record array for deduction amounts
             $newRecord['SSSLoan'] = 0;
             $newRecord['PagibigLoan'] = 0;
-            $newRecord['SalaryLoan'] = 0; 
-            
-            
+            $newRecord['SalaryLoan'] = 0;
+
+
 
             // Iterate over each loan to calculate deductions
             foreach ($loans as $loan) {
@@ -756,7 +764,7 @@ class PayslipController extends Controller
 
             $newRecord['WTAXDeduction'] = $newRecord['WTAXDeduction'] ?? 0;
 
-            
+
             $BasicPay = $TotalHours * $employee->HourlyRate;
             $newRecord['BasicPay'] = $BasicPay;
 
@@ -770,7 +778,7 @@ class PayslipController extends Controller
             $SpecialHolidayPay = $TotalHrsSpecialHol ? $TotalHrsSpecialHol * $employee->HourlyRate * 1.30 : 0;
             $newRecord['SpecialHolidayPay'] = $SpecialHolidayPay;
 
-            $RegularHolidayPay = $TotalHrsRegularHol ? $TotalHrsRegularHol * $employee->HourlyRate * 2: 0;
+            $RegularHolidayPay = $TotalHrsRegularHol ? $TotalHrsRegularHol * $employee->HourlyRate * 2 : 0;
             $newRecord['RegularHolidayPay'] = $RegularHolidayPay;
 
             $GrossPay = $EarningPay + $BasicPay + $SundayPay + $SpecialHolidayPay + $RegularHolidayPay + $TotalOvertimePay;
