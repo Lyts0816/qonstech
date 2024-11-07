@@ -648,7 +648,7 @@ class PayslipController extends Controller
 
                 $GetSSS = \App\Models\sss::get();
 
-                $GetPagibig = \App\Models\Pagibig::get();
+                $GetPagibig = \App\Models\pagibig::get();
 
                 $GetPhilHealth = \App\Models\philhealth::get();
 
