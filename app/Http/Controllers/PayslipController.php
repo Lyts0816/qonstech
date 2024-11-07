@@ -156,11 +156,12 @@ class PayslipController extends Controller
             $TotalOvertimeHours = 0;
             $TotalOvertimePay = 0;
             $TotalTardiness = 0;
-            $TotalTardinessDed = 0;
-            $TotalUndertimeDed = 0;
             $TotalUndertime = 0;
             $DeductionFee = 0;
 
+            $newRecord['TotalTardinessDed'] = 0;
+						$newRecord['TotalUndertimeDed'] = 0;
+            
             foreach ($finalAttendance as $attendances) {
                 // dd($attendances);
                 $attendanceDate = Carbon::parse($attendances['Date']);
