@@ -191,7 +191,17 @@ class WorkSchedResource extends Resource
             ])
 
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                ->hidden(fn($record) => $record->trashed()),
+
+                Tables\Actions\DeleteAction::make()->label('Deactivate')
+                ->modalSubmitActionLabel('Deactivate')
+                ->modalHeading('Deactivate Work Schedule')
+                ->hidden(fn($record) => $record->trashed())
+                ->successNotificationTitle('Work Schedule Deactivated'),
+
+                Tables\Actions\ForceDeleteAction::make(),
+                Tables\Actions\RestoreAction::make(),
             ])
             ->bulkActions([
                 // Tables\Actions\BulkActionGroup::make([
@@ -206,6 +216,14 @@ class WorkSchedResource extends Resource
             //
         ];
     }
+
+    public static function getEloquentQuery(): Builder
+	{
+		return parent::getEloquentQuery()
+			->withoutGlobalScopes([
+				SoftDeletingScope::class,
+			]);
+	}
 
     public static function getPages(): array
     {
