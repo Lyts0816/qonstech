@@ -134,14 +134,32 @@ public static function table(Table $table): Table
             // Add filters here if needed
         ])
         ->actions([
-            Tables\Actions\EditAction::make(),
+            Tables\Actions\EditAction::make()
+                ->hidden(fn($record) => $record->trashed()),
+
+            Tables\Actions\DeleteAction::make()->label('Deactivate')
+            ->modalSubmitActionLabel('Deactivate')
+            ->modalHeading('Deactivate Earnings')
+            ->hidden(fn($record) => $record->trashed())
+            ->successNotificationTitle('Earnings Deactivated'),
+
+            Tables\Actions\ForceDeleteAction::make(),
+            Tables\Actions\RestoreAction::make(),
         ])
         ->bulkActions([
-            Tables\Actions\BulkActionGroup::make([
-                Tables\Actions\DeleteBulkAction::make(),
-            ]),
+            // Tables\Actions\BulkActionGroup::make([
+            //     Tables\Actions\DeleteBulkAction::make(),
+            // ]),
         ]);
 }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                SoftDeletingScope::class,
+            ]);
+    }
 
 
     public static function getRelations(): array

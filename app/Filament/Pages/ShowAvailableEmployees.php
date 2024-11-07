@@ -19,7 +19,7 @@ class ShowAvailableEmployees extends Page
 
     public static function canAccess(): bool
     {
-    return  Auth::user()->role === User::ROLE_ADMIN;
+    return  Auth::user()->role === User::ROLE_ADMIN || Auth::user()->role === User::ROLE_PROJECTCLERK;
     }
 
 
