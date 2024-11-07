@@ -256,15 +256,16 @@ class PayrollResource extends Resource
 				// 		});
 				// 	}),
 
-					SelectFilter::make('project_id')
+				SelectFilter::make('project_id')
 					->label('Select Project')
 					->options(Project::all()->pluck('ProjectName', 'id'))
-					->query(function (Builder $query, $value) {
-						if ($value) {
-							$query->whereHas('project', function (Builder $query) use ($value) {
-								$query->where('id', $value);
-							});
+					->query(function (Builder $query, array $data) {
+						if (empty($data['value'])) {
+							return $query;
 						}
+						return $query->whereHas('employee.project', function (Builder $query) use ($data) {
+							$query->where('id', $data['value']);
+						});
 					}),
 
 				// SelectFilter::make('projectName')
