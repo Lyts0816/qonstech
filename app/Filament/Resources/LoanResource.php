@@ -16,6 +16,8 @@ use Filament\Tables;
 use Illuminate\Support\Facades\Log;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 
 class LoanResource extends Resource
@@ -217,7 +219,17 @@ class LoanResource extends Resource
                 // You can add any filters if needed
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                ->hidden(fn($record) => $record->trashed()),
+
+                Tables\Actions\DeleteAction::make()->label('Deactivate')
+                ->modalSubmitActionLabel('Deactivate')
+                ->modalHeading('Deactivate Loan')
+                ->hidden(fn($record) => $record->trashed())
+                ->successNotificationTitle('Loan Deactivated'),
+
+                Tables\Actions\ForceDeleteAction::make(),
+                Tables\Actions\RestoreAction::make(),
             ])
             ->bulkActions([
                 // Tables\Actions\BulkActionGroup::make([
@@ -237,6 +249,14 @@ class LoanResource extends Resource
             //
         ];
     }
+    
+    public static function getEloquentQuery(): Builder
+	{
+		return parent::getEloquentQuery()
+			->withoutGlobalScopes([
+				SoftDeletingScope::class,
+			]);
+	}
 
     public static function getPages(): array
     {
