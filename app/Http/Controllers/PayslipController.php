@@ -65,7 +65,9 @@ class PayslipController extends Controller
                 // dd($employeesWPosition->get());
         } else {
             // If not project-based, filter employees without a project
-            $employeesWPosition = $employeesWPosition->whereNull('project_id');
+            $employeesWPosition = $employeesWPosition
+						->whereNot('assignment', 'Project Based')
+						->whereNull('project_id');
         }
         // dd($employeesWPosition->get());
         // Execute the query and get results
