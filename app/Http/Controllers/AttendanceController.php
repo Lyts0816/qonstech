@@ -31,23 +31,23 @@ class AttendanceController extends Controller
 
 			// Retrieve DTR data for the employee
 			// Example: replace with your actual DTR fetching logic
-			if($projectId){
+			if ($projectId) {
 				$data = Attendance::where('employee_id', $employeeId)
-				->where('ProjectID', $projectId)
-				->whereBetween('Date', [$startDate, $endDate])
-				->orderBy('Date', 'asc')
-				->get();
+					->where('ProjectID', $projectId)
+					->whereBetween('Date', [$startDate, $endDate])
+					->orderBy('Date', 'asc')
+					->get();
 			} else {
 				$data = Attendance::where('employee_id', $employeeId)
-				->whereNull('ProjectID')
-				->orWhere('ProjectID', 0)
-				->whereBetween('Date', [$startDate, $endDate])
-				->orderBy('Date', 'asc')
-				->get();
+					->whereNull('ProjectID')
+					->orWhere('ProjectID', 0)
+					->whereBetween('Date', [$startDate, $endDate])
+					->orderBy('Date', 'asc')
+					->get();
 			}
-			
 
-				// dd($data);
+
+			// dd($data);
 
 			if (count($data) > 0) {
 				$TotalHours = 0;
@@ -55,6 +55,8 @@ class AttendanceController extends Controller
 				$underTimeMorningMinutes = 0;
 				$tardinessAfternoonMinutes = 0;
 				$underTimeAfternoonMinutes = 0;
+				$workedMorningHours = 0;
+				$workedAfternoonHours = 0;
 				foreach ($data as $attendances) {
 					$attendanceDate = Carbon::parse($attendances['Date']);
 
@@ -78,39 +80,40 @@ class AttendanceController extends Controller
 					$morningEnd = Carbon::createFromTime($Out1Array[0], $Out1Array[1], $Out1Array[2]);  // 12:00 PM
 					$afternoonStart = Carbon::createFromTime($In2Array[0], $In2Array[1], $In2Array[2]); // 1:00 PM
 					$afternoonEnd = Carbon::createFromTime($Out2Array[0], $Out2Array[1], $Out2Array[2]);  // 5:00 PM
-					
-if($attendances["Checkin_One"] && $attendances["Checkout_One"] && $attendances["Checkin_Two"] && $attendances["Checkout_Two"]) {
-					$checkinOne = Carbon::createFromFormat('H:i', substr($attendances["Checkin_One"], 0, 5));
-					$checkoutOne = Carbon::createFromFormat('H:i', substr($attendances["Checkout_One"], 0, 5));
 
-					$effectiveCheckinOne = $checkinOne->greaterThan($morningStart) ? $checkinOne : $morningStart;
-					$effectiveCheckOutOne = $checkoutOne->lessThan($morningEnd) ? $checkoutOne : $morningEnd;
-					$workedMorningMinutes = $effectiveCheckinOne->diffInMinutes($checkoutOne);
-					$underTimeMorningMinutes = $effectiveCheckOutOne->diffInMinutes($morningEnd);
-					$tardinessMorningMinutes = $morningStart->diffInMinutes($checkinOne);
-					$workedMorningHours = $workedMorningMinutes / 60;
+					if ($attendances["Checkin_One"] && $attendances["Checkout_One"]) {
+						$checkinOne = Carbon::createFromFormat('H:i', substr($attendances["Checkin_One"], 0, 5));
+						$checkoutOne = Carbon::createFromFormat('H:i', substr($attendances["Checkout_One"], 0, 5));
 
-					$checkinTwo = Carbon::createFromFormat('H:i', substr($attendances["Checkin_Two"], 0, 5));
-					$checkoutTwo = Carbon::createFromFormat('H:i', substr($attendances["Checkout_Two"], 0, 5));
+						$effectiveCheckinOne = $checkinOne->greaterThan($morningStart) ? $checkinOne : $morningStart;
+						$effectiveCheckOutOne = $checkoutOne->lessThan($morningEnd) ? $checkoutOne : $morningEnd;
+						$workedMorningMinutes = $effectiveCheckinOne->diffInMinutes($checkoutOne);
+						$underTimeMorningMinutes = $effectiveCheckOutOne->diffInMinutes($morningEnd);
+						$tardinessMorningMinutes = $morningStart->diffInMinutes($checkinOne);
+						$workedMorningHours = $workedMorningMinutes / 60;
+					}
+					if ($attendances["Checkin_Two"] && $attendances["Checkout_Two"]) {
+						$checkinTwo = Carbon::createFromFormat('H:i', substr($attendances["Checkin_Two"], 0, 5));
+						$checkoutTwo = Carbon::createFromFormat('H:i', substr($attendances["Checkout_Two"], 0, 5));
 
-					$effectivecheckinTwo = $checkinTwo->greaterThan($afternoonStart) ? $checkinTwo : $afternoonStart;
-					$effectiveCheckOutTwo = $checkoutTwo->lessThan($afternoonEnd) ? $checkoutTwo : $afternoonEnd;
-					$workedAfternoonMinutes = $effectivecheckinTwo->diffInMinutes($checkoutTwo);
-					$underTimeAfternoonMinutes = $effectiveCheckOutTwo->diffInMinutes($afternoonEnd);
-					$tardinessAfternoonMinutes = $afternoonStart->diffInMinutes($checkinTwo);
-					$workedAfternoonHours = $workedAfternoonMinutes / 60;
+						$effectivecheckinTwo = $checkinTwo->greaterThan($afternoonStart) ? $checkinTwo : $afternoonStart;
+						$effectiveCheckOutTwo = $checkoutTwo->lessThan($afternoonEnd) ? $checkoutTwo : $afternoonEnd;
+						$workedAfternoonMinutes = $effectivecheckinTwo->diffInMinutes($checkoutTwo);
+						$underTimeAfternoonMinutes = $effectiveCheckOutTwo->diffInMinutes($afternoonEnd);
+						$tardinessAfternoonMinutes = $afternoonStart->diffInMinutes($checkinTwo);
+						$workedAfternoonHours = $workedAfternoonMinutes / 60;
+					}
 
 					$totalWorkedHours = $workedMorningHours + $workedAfternoonHours;
 					$netWorkedHours = $totalWorkedHours;
 
 					$TotalHours += $netWorkedHours;
-}
 					$attendances['TotalHours'] = $TotalHours;
 					$attendances['MorningTardy'] = $tardinessMorningMinutes > 0 ? $tardinessMorningMinutes : 0;
 					$attendances['MorningUndertime'] = $underTimeMorningMinutes > 0 ? $underTimeMorningMinutes : 0;
 					$attendances['AfternoonTardy'] = $tardinessAfternoonMinutes > 0 ? $tardinessAfternoonMinutes : 0;
 					$attendances['AfternoonUndertime'] = $underTimeAfternoonMinutes > 0 ? $underTimeAfternoonMinutes : 0;
-					
+
 				}
 				$payslipHtml .= view('dtr.show', ['employee' => $employee, 'data' => $data->toArray()])->render();
 			}
@@ -195,7 +198,7 @@ if($attendances["Checkin_One"] && $attendances["Checkout_One"] && $attendances["
 				->where('Date', $date)
 				->orderBy('Date', 'ASC')
 				->get();
-		// dd($attendance->toArray());
+			// dd($attendance->toArray());
 			foreach ($attendance as $attendances) {
 
 				$employeesWPosition = \App\Models\Employee::where('project_id', $payroll->ProjectID)
@@ -242,6 +245,10 @@ if($attendances["Checkin_One"] && $attendances["Checkout_One"] && $attendances["
 					}
 
 					$TotalHours = 0;
+					$tardinessMorningMinutes = 0;
+					$underTimeMorningMinutes = 0;
+					$tardinessAfternoonMinutes = 0;
+					$underTimeAfternoonMinutes = 0;
 					$TotalHoursSunday = 0;
 					$TotalHrsSpecialHol = 0;
 					$TotalHrsRegularHol = 0;
@@ -304,38 +311,40 @@ if($attendances["Checkin_One"] && $attendances["Checkout_One"] && $attendances["
 							$afternoonStart = Carbon::createFromTime($In2Array[0], $In2Array[1], $In2Array[2]); // 1:00 PM
 							$afternoonEnd = Carbon::createFromTime($Out2Array[0], $Out2Array[1], $Out2Array[2]);  // 5:00 PM
 
-							// Calculate morning shift times (ignoring seconds)
-							$checkinOne = Carbon::createFromFormat('H:i', substr($attendances["Checkin_One"], 0, 5));
-							$checkoutOne = Carbon::createFromFormat('H:i', substr($attendances["Checkout_One"], 0, 5));
+							if ($attendances["Checkin_One"] && $attendances["Checkout_One"]) {
+								// Calculate morning shift times (ignoring seconds)
+								$checkinOne = Carbon::createFromFormat('H:i', substr($attendances["Checkin_One"], 0, 5));
+								$checkoutOne = Carbon::createFromFormat('H:i', substr($attendances["Checkout_One"], 0, 5));
 
-							// Calculate late time for the morning (in hours)
-							// $lateMorningHours = $checkinOne->greaterThan($morningStart) ? $checkinOne->diffInMinutes($morningEnd) / 60 : 0;
+								// Calculate late time for the morning (in hours)
+								// $lateMorningHours = $checkinOne->greaterThan($morningStart) ? $checkinOne->diffInMinutes($morningEnd) / 60 : 0;
 
-							// Calculate worked hours for morning shift (in hours)
-							$effectiveCheckinOne = $checkinOne->greaterThan($morningStart) ? $checkinOne : $morningStart;
-							$effectiveCheckOutOne = $checkoutOne->lessThan($morningEnd) ? $checkoutOne : $morningEnd;
-							$workedMorningMinutes = $effectiveCheckinOne->diffInMinutes($checkoutOne);
-							$underTimeMorningMinutes = $effectiveCheckOutOne->diffInMinutes($morningEnd);
-							$tardinessMorningMinutes = $morningStart->diffInMinutes($checkinOne);
-							$workedMorningHours = $workedMorningMinutes / 60;
-							// $workedMorningHours = $checkinOne->diffInMinutes($checkoutOne) / 60;
+								// Calculate worked hours for morning shift (in hours)
+								$effectiveCheckinOne = $checkinOne->greaterThan($morningStart) ? $checkinOne : $morningStart;
+								$effectiveCheckOutOne = $checkoutOne->lessThan($morningEnd) ? $checkoutOne : $morningEnd;
+								$workedMorningMinutes = $effectiveCheckinOne->diffInMinutes($checkoutOne);
+								$underTimeMorningMinutes = $effectiveCheckOutOne->diffInMinutes($morningEnd);
+								$tardinessMorningMinutes = $morningStart->diffInMinutes($checkinOne);
+								$workedMorningHours = $workedMorningMinutes / 60;
+								// $workedMorningHours = $checkinOne->diffInMinutes($checkoutOne) / 60;
+							}
+							if ($attendances["Checkin_Two"] && $attendances["Checkout_Two"]) {
+								// Calculate afternoon shift times (ignoring seconds)
+								$checkinTwo = Carbon::createFromFormat('H:i', substr($attendances["Checkin_Two"], 0, 5));
+								$checkoutTwo = Carbon::createFromFormat('H:i', substr($attendances["Checkout_Two"], 0, 5));
 
-							// Calculate afternoon shift times (ignoring seconds)
-							$checkinTwo = Carbon::createFromFormat('H:i', substr($attendances["Checkin_Two"], 0, 5));
-							$checkoutTwo = Carbon::createFromFormat('H:i', substr($attendances["Checkout_Two"], 0, 5));
+								// Calculate late time for the afternoon (in hours)
+								$lateAfternoonHours = $checkinTwo->greaterThan($afternoonStart) ? $checkinTwo->diffInMinutes($afternoonEnd) / 60 : 0;
 
-							// Calculate late time for the afternoon (in hours)
-							$lateAfternoonHours = $checkinTwo->greaterThan($afternoonStart) ? $checkinTwo->diffInMinutes($afternoonEnd) / 60 : 0;
-
-							// Calculate worked hours for afternoon shift (in hours)
-							$effectivecheckinTwo = $checkinTwo->greaterThan($afternoonStart) ? $checkinTwo : $afternoonStart;
-							$effectiveCheckOutTwo = $checkoutTwo->lessThan($afternoonEnd) ? $checkoutTwo : $afternoonEnd;
-							$workedAfternoonMinutes = $effectivecheckinTwo->diffInMinutes($checkoutTwo);
-							$underTimeAfternoonMinutes = $effectiveCheckOutTwo->diffInMinutes($afternoonEnd);
-							$tardinessAfternoonMinutes = $afternoonStart->diffInMinutes($checkinTwo);
-							$workedAfternoonHours = $workedAfternoonMinutes / 60;
-							// $workedAfternoonHours = $checkinTwo->diffInMinutes($checkoutTwo) / 60;
-
+								// Calculate worked hours for afternoon shift (in hours)
+								$effectivecheckinTwo = $checkinTwo->greaterThan($afternoonStart) ? $checkinTwo : $afternoonStart;
+								$effectiveCheckOutTwo = $checkoutTwo->lessThan($afternoonEnd) ? $checkoutTwo : $afternoonEnd;
+								$workedAfternoonMinutes = $effectivecheckinTwo->diffInMinutes($checkoutTwo);
+								$underTimeAfternoonMinutes = $effectiveCheckOutTwo->diffInMinutes($afternoonEnd);
+								$tardinessAfternoonMinutes = $afternoonStart->diffInMinutes($checkinTwo);
+								$workedAfternoonHours = $workedAfternoonMinutes / 60;
+								// $workedAfternoonHours = $checkinTwo->diffInMinutes($checkoutTwo) / 60;
+							}
 							// Total worked hours minus late hours
 							$totalWorkedHours = $workedMorningHours + $workedAfternoonHours;
 							// $totalLateHours = $lateMorningHours + $lateAfternoonHours;
@@ -362,33 +371,34 @@ if($attendances["Checkin_One"] && $attendances["Checkout_One"] && $attendances["
 								$morningEnd = Carbon::createFromTime($Out1Array[0], $Out1Array[1], $Out1Array[2]);  // 12:00 PM
 								$afternoonStart = Carbon::createFromTime($In2Array[0], $In2Array[1], $In2Array[2]); // 1:00 PM
 								$afternoonEnd = Carbon::createFromTime($Out2Array[0], $Out2Array[1], $Out2Array[2]);  // 5:00 PM
+								if ($attendances["Checkin_One"] && $attendances["Checkout_One"]) {
+									$checkinOne = Carbon::createFromFormat('H:i', substr($attendances["Checkin_One"], 0, 5));
+									$checkoutOne = Carbon::createFromFormat('H:i', substr($attendances["Checkout_One"], 0, 5));
 
-								$checkinOne = Carbon::createFromFormat('H:i', substr($attendances["Checkin_One"], 0, 5));
-								$checkoutOne = Carbon::createFromFormat('H:i', substr($attendances["Checkout_One"], 0, 5));
+									// $lateMorningHours = $checkinOne->greaterThan($morningStart) ? $checkinOne->diffInMinutes($morningEnd) / 60 : 0;
 
-								// $lateMorningHours = $checkinOne->greaterThan($morningStart) ? $checkinOne->diffInMinutes($morningEnd) / 60 : 0;
+									$effectiveCheckinOne = $checkinOne->greaterThan($morningStart) ? $checkinOne : $morningStart;
+									$effectiveCheckOutOne = $checkoutOne->lessThan($morningEnd) ? $checkoutOne : $morningEnd;
+									$workedMorningMinutes = $effectiveCheckinOne->diffInMinutes($checkoutOne);
+									$underTimeMorningMinutes = $effectiveCheckOutOne->diffInMinutes($morningEnd);
+									$tardinessMorningMinutes = $morningStart->diffInMinutes($checkinOne);
+									$workedMorningHours = $workedMorningMinutes / 60;
+									// $workedMorningHours = $checkinOne->diffInMinutes($checkoutOne) / 60;
+								}
+								if ($attendances["Checkin_Two"] && $attendances["Checkout_Two"]) {
+									$checkinTwo = Carbon::createFromFormat('H:i', substr($attendances["Checkin_Two"], 0, 5));
+									$checkoutTwo = Carbon::createFromFormat('H:i', substr($attendances["Checkout_Two"], 0, 5));
 
-								$effectiveCheckinOne = $checkinOne->greaterThan($morningStart) ? $checkinOne : $morningStart;
-								$effectiveCheckOutOne = $checkoutOne->lessThan($morningEnd) ? $checkoutOne : $morningEnd;
-								$workedMorningMinutes = $effectiveCheckinOne->diffInMinutes($checkoutOne);
-								$underTimeMorningMinutes = $effectiveCheckOutOne->diffInMinutes($morningEnd);
-								$tardinessMorningMinutes = $morningStart->diffInMinutes($checkinOne);
-								$workedMorningHours = $workedMorningMinutes / 60;
-								// $workedMorningHours = $checkinOne->diffInMinutes($checkoutOne) / 60;
+									// $lateAfternoonHours = $checkinTwo->greaterThan($afternoonStart) ? $checkinTwo->diffInMinutes($afternoonEnd) / 60 : 0;
 
-								$checkinTwo = Carbon::createFromFormat('H:i', substr($attendances["Checkin_Two"], 0, 5));
-								$checkoutTwo = Carbon::createFromFormat('H:i', substr($attendances["Checkout_Two"], 0, 5));
-
-								// $lateAfternoonHours = $checkinTwo->greaterThan($afternoonStart) ? $checkinTwo->diffInMinutes($afternoonEnd) / 60 : 0;
-
-								$effectivecheckinTwo = $checkinTwo->greaterThan($afternoonStart) ? $checkinTwo : $afternoonStart;
-								$effectiveCheckOutTwo = $checkoutTwo->lessThan($afternoonEnd) ? $checkoutTwo : $afternoonEnd;
-								$workedAfternoonMinutes = $effectivecheckinTwo->diffInMinutes($checkoutTwo);
-								$underTimeAfternoonMinutes = $effectiveCheckOutTwo->diffInMinutes($afternoonEnd);
-								$tardinessAfternoonMinutes = $afternoonStart->diffInMinutes($checkinTwo);
-								$workedAfternoonHours = $workedAfternoonMinutes / 60;
-								// $workedAfternoonHours = $checkinTwo->diffInMinutes($checkoutTwo) / 60;
-
+									$effectivecheckinTwo = $checkinTwo->greaterThan($afternoonStart) ? $checkinTwo : $afternoonStart;
+									$effectiveCheckOutTwo = $checkoutTwo->lessThan($afternoonEnd) ? $checkoutTwo : $afternoonEnd;
+									$workedAfternoonMinutes = $effectivecheckinTwo->diffInMinutes($checkoutTwo);
+									$underTimeAfternoonMinutes = $effectiveCheckOutTwo->diffInMinutes($afternoonEnd);
+									$tardinessAfternoonMinutes = $afternoonStart->diffInMinutes($checkinTwo);
+									$workedAfternoonHours = $workedAfternoonMinutes / 60;
+									// $workedAfternoonHours = $checkinTwo->diffInMinutes($checkoutTwo) / 60;
+								}
 								$totalWorkedHours = $workedMorningHours + $workedAfternoonHours;
 								// $totalLateHours = $lateMorningHours + $lateAfternoonHours;
 
@@ -425,32 +435,33 @@ if($attendances["Checkin_One"] && $attendances["Checkout_One"] && $attendances["
 								$morningEnd = Carbon::createFromTime($Out1Array[0], $Out1Array[1], $Out1Array[2]);  // 12:00 PM
 								$afternoonStart = Carbon::createFromTime($In2Array[0], $In2Array[1], $In2Array[2]); // 1:00 PM
 								$afternoonEnd = Carbon::createFromTime($Out2Array[0], $Out2Array[1], $Out2Array[2]);  // 5:00 PM
+								if ($attendances["Checkin_One"] && $attendances["Checkout_One"]) {
+									$checkinOne = Carbon::createFromFormat('H:i', substr($attendances["Checkin_One"], 0, 5));
+									$checkoutOne = Carbon::createFromFormat('H:i', substr($attendances["Checkout_One"], 0, 5));
 
-								$checkinOne = Carbon::createFromFormat('H:i', substr($attendances["Checkin_One"], 0, 5));
-								$checkoutOne = Carbon::createFromFormat('H:i', substr($attendances["Checkout_One"], 0, 5));
+									// $lateMorningHours = $checkinOne->greaterThan($morningStart) ? $checkinOne->diffInMinutes($morningStart) / 60 : 0;
 
-								// $lateMorningHours = $checkinOne->greaterThan($morningStart) ? $checkinOne->diffInMinutes($morningStart) / 60 : 0;
+									$effectiveCheckinOne = $checkinOne->greaterThan($morningStart) ? $checkinOne : $morningStart;
+									$effectiveCheckOutOne = $checkoutOne->lessThan($morningEnd) ? $checkoutOne : $morningEnd;
+									$workedMorningMinutes = $effectiveCheckinOne->diffInMinutes($checkoutOne);
+									$underTimeMorningMinutes = $effectiveCheckOutOne->diffInMinutes($morningEnd);
+									$tardinessMorningMinutes = $morningStart->diffInMinutes($checkinOne);
+									$workedMorningHours = $workedMorningMinutes / 60;
+									// $workedMorningHours = $checkinOne->diffInMinutes($morningEnd) / 60;
+								}
+								if ($attendances["Checkin_Two"] && $attendances["Checkout_Two"]) {
+									$checkinTwo = Carbon::createFromFormat('H:i', substr($attendances["Checkin_Two"], 0, 5));
+									$checkoutTwo = Carbon::createFromFormat('H:i', substr($attendances["Checkout_Two"], 0, 5));
 
-								$effectiveCheckinOne = $checkinOne->greaterThan($morningStart) ? $checkinOne : $morningStart;
-								$effectiveCheckOutOne = $checkoutOne->lessThan($morningEnd) ? $checkoutOne : $morningEnd;
-								$workedMorningMinutes = $effectiveCheckinOne->diffInMinutes($checkoutOne);
-								$underTimeMorningMinutes = $effectiveCheckOutOne->diffInMinutes($morningEnd);
-								$tardinessMorningMinutes = $morningStart->diffInMinutes($checkinOne);
-								$workedMorningHours = $workedMorningMinutes / 60;
-								// $workedMorningHours = $checkinOne->diffInMinutes($morningEnd) / 60;
+									// $lateAfternoonHours = $checkinTwo->greaterThan($afternoonStart) ? $checkinTwo->diffInMinutes($afternoonEnd) / 60 : 0;
 
-								$checkinTwo = Carbon::createFromFormat('H:i', substr($attendances["Checkin_Two"], 0, 5));
-								$checkoutTwo = Carbon::createFromFormat('H:i', substr($attendances["Checkout_Two"], 0, 5));
-
-								// $lateAfternoonHours = $checkinTwo->greaterThan($afternoonStart) ? $checkinTwo->diffInMinutes($afternoonEnd) / 60 : 0;
-
-								$effectivecheckinTwo = $checkinTwo->greaterThan($afternoonStart) ? $checkinTwo : $afternoonStart;
-								$effectiveCheckOutTwo = $checkoutTwo->lessThan($afternoonEnd) ? $checkoutTwo : $afternoonEnd;
-								$workedAfternoonMinutes = $effectivecheckinTwo->diffInMinutes($checkoutTwo);
-								$underTimeAfternoonMinutes = $effectiveCheckOutTwo->diffInMinutes($afternoonEnd);
-								$tardinessAfternoonMinutes = $afternoonStart->diffInMinutes($checkinTwo);
-								$workedAfternoonHours = $workedAfternoonMinutes / 60;
-
+									$effectivecheckinTwo = $checkinTwo->greaterThan($afternoonStart) ? $checkinTwo : $afternoonStart;
+									$effectiveCheckOutTwo = $checkoutTwo->lessThan($afternoonEnd) ? $checkoutTwo : $afternoonEnd;
+									$workedAfternoonMinutes = $effectivecheckinTwo->diffInMinutes($checkoutTwo);
+									$underTimeAfternoonMinutes = $effectiveCheckOutTwo->diffInMinutes($afternoonEnd);
+									$tardinessAfternoonMinutes = $afternoonStart->diffInMinutes($checkinTwo);
+									$workedAfternoonHours = $workedAfternoonMinutes / 60;
+								}
 								$totalWorkedHours = $workedMorningHours + $workedAfternoonHours;
 								// $totalLateHours = $lateMorningHours + $lateAfternoonHours;
 								$netWorkedHours = $totalWorkedHours
