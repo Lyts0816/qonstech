@@ -31,16 +31,30 @@ class AttendanceController extends Controller
 
 			// Retrieve DTR data for the employee
 			// Example: replace with your actual DTR fetching logic
-			$data = Attendance::where('employee_id', $employeeId)
+			if($projectId){
+				$data = Attendance::where('employee_id', $employeeId)
 				->where('ProjectID', $projectId)
 				->whereBetween('Date', [$startDate, $endDate])
 				->orderBy('Date', 'asc')
 				->get();
+			} else {
+				$data = Attendance::where('employee_id', $employeeId)
+				->whereNull('ProjectID')
+				->orWhere('ProjectID', 0)
+				->whereBetween('Date', [$startDate, $endDate])
+				->orderBy('Date', 'asc')
+				->get();
+			}
+			
 
 				// dd($data);
 
 			if (count($data) > 0) {
 				$TotalHours = 0;
+				$tardinessMorningMinutes = 0;
+				$underTimeMorningMinutes = 0;
+				$tardinessAfternoonMinutes = 0;
+				$underTimeAfternoonMinutes = 0;
 				foreach ($data as $attendances) {
 					$attendanceDate = Carbon::parse($attendances['Date']);
 
@@ -64,7 +78,8 @@ class AttendanceController extends Controller
 					$morningEnd = Carbon::createFromTime($Out1Array[0], $Out1Array[1], $Out1Array[2]);  // 12:00 PM
 					$afternoonStart = Carbon::createFromTime($In2Array[0], $In2Array[1], $In2Array[2]); // 1:00 PM
 					$afternoonEnd = Carbon::createFromTime($Out2Array[0], $Out2Array[1], $Out2Array[2]);  // 5:00 PM
-
+					
+if($attendances["Checkin_One"] && $attendances["Checkout_One"] && $attendances["Checkin_Two"] && $attendances["Checkout_Two"]) {
 					$checkinOne = Carbon::createFromFormat('H:i', substr($attendances["Checkin_One"], 0, 5));
 					$checkoutOne = Carbon::createFromFormat('H:i', substr($attendances["Checkout_One"], 0, 5));
 
@@ -89,11 +104,13 @@ class AttendanceController extends Controller
 					$netWorkedHours = $totalWorkedHours;
 
 					$TotalHours += $netWorkedHours;
+}
 					$attendances['TotalHours'] = $TotalHours;
 					$attendances['MorningTardy'] = $tardinessMorningMinutes > 0 ? $tardinessMorningMinutes : 0;
 					$attendances['MorningUndertime'] = $underTimeMorningMinutes > 0 ? $underTimeMorningMinutes : 0;
 					$attendances['AfternoonTardy'] = $tardinessAfternoonMinutes > 0 ? $tardinessAfternoonMinutes : 0;
 					$attendances['AfternoonUndertime'] = $underTimeAfternoonMinutes > 0 ? $underTimeAfternoonMinutes : 0;
+					
 				}
 				$payslipHtml .= view('dtr.show', ['employee' => $employee, 'data' => $data->toArray()])->render();
 			}

@@ -104,7 +104,7 @@ class AttendanceResource extends Resource
                                     Session::put('selected_project_id', $data['selectedProjectId']);
                                     $query->where('ProjectID', $data['selectedProjectId']); // Make sure to use project_id for filtering
                                 } else {
-																		$query->whereNull('ProjectID'); // Make sure to use project_id for filtering
+																		$query->where('ProjectID', 0)->orWhere('ProjectID', null); // Make sure to use project_id for filtering
 																		Session::put('selected_project_id', null);
 																}
                                 return $query;
