@@ -331,7 +331,7 @@ class PayslipResource extends Resource
                     ->label('View Payslip')
                     ->icon('heroicon-o-calculator')
                     ->color('info')
-                    ->url(fn($record) => route('generate.payslips', $record->toArray())) // Pass the ProjectID
+                    ->url(fn($record) => route('generate.payslips', ['record' => $record->toArray()])) // Pass the ProjectID
                     ->openUrlInNewTab(),
 
             ])

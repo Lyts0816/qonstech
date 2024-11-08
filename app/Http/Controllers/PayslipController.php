@@ -37,6 +37,7 @@ class PayslipController extends Controller
         // }
 
         // Query for employees with their position
+				if($request['employee_id']) {
         if ($request['employee_id'] === 'All') {
             $employeesWPosition = \App\Models\Employee::where('employment_type', $request->record['EmployeeStatus'])
                 ->join('positions', 'employees.position_id', '=', 'positions.id')
@@ -47,6 +48,11 @@ class PayslipController extends Controller
                 ->join('positions', 'employees.position_id', '=', 'positions.id')
                 ->select('employees.*', 'positions.PositionName', 'positions.MonthlySalary', 'positions.HourlyRate');
         }
+			} else {
+				$employeesWPosition = \App\Models\Employee::where('employment_type', $request->record['EmployeeStatus'])
+            ->join('positions', 'employees.position_id', '=', 'positions.id')
+            ->select('employees.*', 'positions.PositionName', 'positions.MonthlySalary', 'positions.HourlyRate');
+			}
 
 
 
