@@ -72,10 +72,10 @@ class PayslipController extends Controller
         $employeesWPosition = $employeesWPosition->get();
 
 
-       
+   
         $payrollRecords = collect();
 
-        if ($employeesWPosition != []) {
+        if ($employeesWPosition->toArray() != []) {
 
             foreach ($employeesWPosition as $employee) {
 

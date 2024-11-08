@@ -357,6 +357,7 @@ class ReportResource extends Resource
                                     return ['All' => 'All Employees'] + $employees->toArray();
                                 } else {
                                     $employees = \App\Models\Employee::where('employment_type', $EmployeeStatus)
+																				->whereNull('project_id')
                                         ->get()
                                         ->mapWithKeys(function ($employee) {
                                             return [$employee->id => "{$employee->first_name} {$employee->last_name}"];
