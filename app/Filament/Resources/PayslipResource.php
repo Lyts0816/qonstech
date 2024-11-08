@@ -328,17 +328,26 @@ class PayslipResource extends Resource
             ->actions([
                 // Tables\Actions\EditAction::make(),
                 Tables\Actions\Action::make('viewPayslip')
-                    ->label('View Payslip')
-                    ->icon('heroicon-o-calculator')
-                    ->color('info')
-                    ->url(fn($record) => route('generate.payslips', ['record' => $record->toArray()])) // Pass the ProjectID
-                    ->openUrlInNewTab(),
+                ->hidden(fn($record) => $record->trashed())
+                ->label('View Payslip')
+                ->icon('heroicon-o-calculator')
+                ->color('info')
+                ->url(fn($record) => route('generate.payslips', ['record' => $record->toArray()])) // Pass the ProjectID
+                ->openUrlInNewTab(),
+
+                Tables\Actions\DeleteAction::make()->label('Archive')
+                ->modalSubmitActionLabel('Archived')
+                ->modalHeading('Archived Payslip')
+                ->hidden(fn($record) => $record->trashed())
+                ->successNotificationTitle('Payslip Archived'),
+
+                Tables\Actions\RestoreAction::make(),
 
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                // Tables\Actions\BulkActionGroup::make([
+                //     Tables\Actions\DeleteBulkAction::make(),
+                // ]),
             ]);
     }
 
@@ -375,6 +384,14 @@ class PayslipResource extends Resource
             //
         ];
     }
+
+    public static function getEloquentQuery(): Builder
+	{
+		return parent::getEloquentQuery()
+			->withoutGlobalScopes([
+				SoftDeletingScope::class,
+			]);
+	}
 
     public static function getPages(): array
     {

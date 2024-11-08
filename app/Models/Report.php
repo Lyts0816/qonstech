@@ -4,10 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Report extends Model
 {
     use HasFactory;
+    use SoftDeletes;
+    
     protected $fillable = [
         'EmployeeID',
         'PayrollDate',
@@ -40,8 +43,8 @@ class Report extends Model
     {
         return "{$this->first_name} {$this->last_name}";
     }
-    public function dates()
-    {
-        return $this->hasMany(PayrollDate::class); // Adjust class name if necessary
-    }
+    // public function dates()
+    // {
+    //     return $this->hasMany(PayrollDate::class); // Adjust class name if necessary
+    // }
 }
