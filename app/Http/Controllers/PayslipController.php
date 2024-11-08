@@ -65,7 +65,9 @@ class PayslipController extends Controller
                 // dd($employeesWPosition->get());
         } else {
             // If not project-based, filter employees without a project
-            $employeesWPosition = $employeesWPosition->whereNull('project_id');
+            $employeesWPosition = $employeesWPosition
+						->whereNot('assignment', 'Project Based')
+						->whereNull('project_id');
         }
         // dd($employeesWPosition->get());
         // Execute the query and get results
@@ -149,6 +151,10 @@ class PayslipController extends Controller
 
                 $finalAttendance = $attendance;
                 $TotalHours = 0;
+								$tardinessMorningMinutes = 0;
+								$underTimeMorningMinutes = 0;
+								$tardinessAfternoonMinutes = 0;
+								$underTimeAfternoonMinutes = 0;
                 $TotalHoursSunday = 0;
                 $TotalHrsSpecialHol = 0;
                 $TotalHrsRegularHol = 0;
@@ -212,6 +218,8 @@ class PayslipController extends Controller
                             $afternoonStart = Carbon::createFromTime($In2Array[0], $In2Array[1], $In2Array[2]); // 1:00 PM
                             $afternoonEnd = Carbon::createFromTime($Out2Array[0], $Out2Array[1], $Out2Array[2]);  // 5:00 PM
 
+												if($attendances["Checkin_One"] && $attendances["Checkout_One"] && $attendances["Checkin_Two"] && $attendances["Checkout_Two"]) {
+
                             // Calculate morning shift times (ignoring seconds)
                             $checkinOne = Carbon::createFromFormat('H:i', substr($attendances["Checkin_One"], 0, 5));
                             $checkoutOne = Carbon::createFromFormat('H:i', substr($attendances["Checkout_One"], 0, 5));
@@ -258,7 +266,7 @@ class PayslipController extends Controller
 
                             $TotalUndertime += ($underTimeMorningMinutes > 0 ? $underTimeMorningMinutes : 0)
                                 + ($underTimeAfternoonMinutes > 0 ? $underTimeAfternoonMinutes : 0);
-
+												}
                             $newRecord['TotalTardiness'] = $TotalTardiness;
                             $newRecord['TotalUndertime'] = $TotalUndertime;
 
@@ -281,7 +289,7 @@ class PayslipController extends Controller
                                 $morningEnd = Carbon::createFromTime($Out1Array[0], $Out1Array[1], $Out1Array[2]);  // 12:00 PM
                                 $afternoonStart = Carbon::createFromTime($In2Array[0], $In2Array[1], $In2Array[2]); // 1:00 PM
                                 $afternoonEnd = Carbon::createFromTime($Out2Array[0], $Out2Array[1], $Out2Array[2]);  // 5:00 PM
-
+														if($attendances["Checkin_One"] && $attendances["Checkout_One"] && $attendances["Checkin_Two"] && $attendances["Checkout_Two"]) {
                                 $checkinOne = Carbon::createFromFormat('H:i', substr($attendances["Checkin_One"], 0, 5));
                                 $checkoutOne = Carbon::createFromFormat('H:i', substr($attendances["Checkout_One"], 0, 5));
 
@@ -331,7 +339,7 @@ class PayslipController extends Controller
 
                                 $TotalUndertime += ($underTimeMorningMinutes > 0 ? $underTimeMorningMinutes : 0)
                                     + ($underTimeAfternoonMinutes > 0 ? $underTimeAfternoonMinutes : 0);
-
+															}
                                 $newRecord['TotalTardiness'] = $TotalTardiness;
                                 $newRecord['TotalUndertime'] = $TotalUndertime;
 
@@ -353,7 +361,7 @@ class PayslipController extends Controller
                                 $morningEnd = Carbon::createFromTime($Out1Array[0], $Out1Array[1], $Out1Array[2]);  // 12:00 PM
                                 $afternoonStart = Carbon::createFromTime($In2Array[0], $In2Array[1], $In2Array[2]); // 1:00 PM
                                 $afternoonEnd = Carbon::createFromTime($Out2Array[0], $Out2Array[1], $Out2Array[2]);  // 5:00 PM
-
+														if($attendances["Checkin_One"] && $attendances["Checkout_One"] && $attendances["Checkin_Two"] && $attendances["Checkout_Two"]) {
                                 $checkinOne = Carbon::createFromFormat('H:i', substr($attendances["Checkin_One"], 0, 5));
                                 $checkoutOne = Carbon::createFromFormat('H:i', substr($attendances["Checkout_One"], 0, 5));
 
@@ -392,7 +400,7 @@ class PayslipController extends Controller
 
                                 $TotalUndertime += ($underTimeMorningMinutes > 0 ? $underTimeMorningMinutes : 0)
                                     + ($underTimeAfternoonMinutes > 0 ? $underTimeAfternoonMinutes : 0);
-
+														}
                                 $newRecord['TotalTardiness'] = $TotalTardiness;
                                 $newRecord['TotalUndertime'] = $TotalUndertime;
 
