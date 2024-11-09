@@ -757,8 +757,10 @@ class PayrollController extends Controller
             // Update WTAXDeduction in payroll calculation
             $newRecord['WTAXDeduction'] = $taxDue;
 
+                $tardiness = $newRecord['TotalTardinessDed'];
+                $undertime = $newRecord['TotalUndertimeDed'];
 
-            $TotalDeductions = $PagIbigDeduction + $SSSDeduction + $PhilHealthDeduction + $DeductionFee + $newRecord['SSSLoan'] + $newRecord['PagibigLoan'] + $newRecord['SalaryLoan'] + $newRecord['WTAXDeduction'] + $newRecord['TotalTardinessDed'] ?? 0 + $newRecord['TotalUndertimeDed'] ?? 0;
+                $TotalDeductions = $PagIbigDeduction + $SSSDeduction + $PhilHealthDeduction + $DeductionFee + $newRecord['SSSLoan'] + $newRecord['PagibigLoan'] + $newRecord['SalaryLoan'] + $newRecord['WTAXDeduction'] + $tardiness + $undertime;
                 $newRecord['TotalDeductions'] = $TotalDeductions;
 
                 $TotalGovDeductions = $PagIbigDeduction + $SSSDeduction + $PhilHealthDeduction + $newRecord['WTAXDeduction'];

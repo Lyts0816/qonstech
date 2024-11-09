@@ -723,15 +723,15 @@ class PayslipController extends Controller
                         }
 
                         // WTAX Deduction for Kinsenas
-                        foreach ($GetWTAX as $wTax) {
-                            if ($wTax->MinSalary <= $employee->MonthlySalary && $wTax->MaxSalary >= $employee->MonthlySalary) {
-                                $excess = $employee->MonthlySalary - $wTax->MinSalary;
-                                $WTAXAnnual = $wTax->base_rate + ($excess * ($wTax->exceess_percent / 100));
-                                $WTAXDeduction = $WTAXAnnual / $deductionFactor; // Dividing by 12 for monthly and deductionFactor for Kinsenas
-                                $newRecord['WTAXDeduction'] = $WTAXDeduction;
-                                break;
-                            }
-                        }
+                        // foreach ($GetWTAX as $wTax) {
+                        //     if ($wTax->MinSalary <= $employee->MonthlySalary && $wTax->MaxSalary >= $employee->MonthlySalary) {
+                        //         $excess = $employee->MonthlySalary - $wTax->MinSalary;
+                        //         $WTAXAnnual = $wTax->base_rate + ($excess * ($wTax->exceess_percent / 100));
+                        //         $WTAXDeduction = $WTAXAnnual / $deductionFactor; // Dividing by 12 for monthly and deductionFactor for Kinsenas
+                        //         $newRecord['WTAXDeduction'] = $WTAXDeduction;
+                        //         break;
+                        //     }
+                        // }
                     } elseif ($weekPeriod->Category == 'Weekly') {
                         // For Weekly (Week 1, Week 2, Week 3, or Week 4)
                         $deductionFactor = 4; // Weekly deductions are typically divided into 4 parts
@@ -768,15 +768,15 @@ class PayslipController extends Controller
                         }
 
                         // WTAX Deduction for Weekly
-                        foreach ($GetWTAX as $wTax) {
-                            if ($wTax->MinSalary <= $employee->MonthlySalary && $wTax->MaxSalary >= $employee->MonthlySalary) {
-                                $excess = $employee->MonthlySalary - $wTax->MinSalary;
-                                $WTAXAnnual = $wTax->BaseRate + ($excess * ($wTax->ExcessPercent / 100));
-                                $WTAXDeduction = $WTAXAnnual / 12 / $deductionFactor; // Dividing by 12 for monthly and deductionFactor for Weekly
-                                $newRecord['WTAXDeduction'] = $WTAXDeduction;
-                                break;
-                            }
-                        }
+                        // foreach ($GetWTAX as $wTax) {
+                        //     if ($wTax->MinSalary <= $employee->MonthlySalary && $wTax->MaxSalary >= $employee->MonthlySalary) {
+                        //         $excess = $employee->MonthlySalary - $wTax->MinSalary;
+                        //         $WTAXAnnual = $wTax->BaseRate + ($excess * ($wTax->ExcessPercent / 100));
+                        //         $WTAXDeduction = $WTAXAnnual / 12 / $deductionFactor; // Dividing by 12 for monthly and deductionFactor for Weekly
+                        //         $newRecord['WTAXDeduction'] = $WTAXDeduction;
+                        //         break;
+                        //     }
+                        // }
                     }
                 }
                 $taxBrackets = [
@@ -835,16 +835,19 @@ class PayslipController extends Controller
                 }
                 $taxDue = round($withholdingTax, 2);
 
-                if($weekPeriod->Category == 'Kinsenas') {
-                    $taxDue /= 2;
-                }else {
-                    $taxDue /= 4;
-                }
+                // if($weekPeriod->Category == 'Kinsenas') {
+                //     $taxDue /= 2;
+                // }else {
+                //     $taxDue /= 4;
+                // }
 
                 // Update WTAXDeduction in payroll calculation
                 $newRecord['WTAXDeduction'] = $taxDue;
 
-                $TotalDeductions = $PagIbigDeduction + $SSSDeduction + $PhilHealthDeduction + $DeductionFee + $newRecord['SSSLoan'] + $newRecord['PagibigLoan'] + $newRecord['SalaryLoan'] + $newRecord['WTAXDeduction'] + $newRecord['TotalTardinessDed'] + $newRecord['TotalUndertimeDed'];
+                $tardiness = $newRecord['TotalTardinessDed'];
+                $undertime = $newRecord['TotalUndertimeDed'];
+
+                $TotalDeductions = $PagIbigDeduction + $SSSDeduction + $PhilHealthDeduction + $DeductionFee + $newRecord['SSSLoan'] + $newRecord['PagibigLoan'] + $newRecord['SalaryLoan'] + $newRecord['WTAXDeduction'] + $tardiness + $undertime;
                 $newRecord['TotalDeductions'] = $TotalDeductions;
 
                 $TotalGovDeductions = $PagIbigDeduction + $SSSDeduction + $PhilHealthDeduction + $newRecord['WTAXDeduction'];
