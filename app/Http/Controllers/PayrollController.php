@@ -748,11 +748,11 @@ class PayrollController extends Controller
             }
             $taxDue = round($withholdingTax, 2);
 
-            if($weekPeriod->Category == 'Kinsenas') {
-                $taxDue /= 2;
-            }else {
-                $taxDue /= 4;
-            }
+            // if($weekPeriod->Category == 'Kinsenas') {
+            //     $taxDue /= 2;
+            // }else {
+            //     $taxDue /= 4;
+            // }
 
             // Update WTAXDeduction in payroll calculation
             $newRecord['WTAXDeduction'] = $taxDue;
@@ -760,7 +760,7 @@ class PayrollController extends Controller
                 $tardiness = $newRecord['TotalTardinessDed'];
                 $undertime = $newRecord['TotalUndertimeDed'];
 
-                $TotalDeductions = $PagIbigDeduction + $SSSDeduction + $PhilHealthDeduction + $DeductionFee + $newRecord['SSSLoan'] + $newRecord['PagibigLoan'] + $newRecord['SalaryLoan'] + $newRecord['WTAXDeduction'] + $tardiness + $undertime;
+                $TotalDeductions = $PagIbigDeduction + $SSSDeduction + $PhilHealthDeduction + $DeductionFee + $newRecord['SSSLoan'] + $newRecord['PagibigLoan'] + $newRecord['SalaryLoan'] + $taxDue + $tardiness + $undertime;
                 $newRecord['TotalDeductions'] = $TotalDeductions;
 
                 $TotalGovDeductions = $PagIbigDeduction + $SSSDeduction + $PhilHealthDeduction + $newRecord['WTAXDeduction'];
