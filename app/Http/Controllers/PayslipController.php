@@ -824,12 +824,30 @@ class PayslipController extends Controller
                 $taxDue = round($withholdingTax, 2);
 
                 // Update WTAXDeduction in payroll calculation
+                $taxableIncome = $GrossPay - ($SSSDeduction + $PhilHealthDeduction + $PagIbigDeduction);
+                $withholdingTax = 0;
+                foreach ($taxBrackets as $bracket) {
+                    if ($taxableIncome >= $bracket['min'] && $taxableIncome <= $bracket['max']) {
+                        $excess = $taxableIncome - $bracket['compensation'];
+                        $withholdingTax = $bracket['wth_tax'] + ($excess * $bracket['excess_rate']);
+                        break;
+                    }
+                }
+                $taxDue = round($withholdingTax, 2);
+
+                if($weekPeriod->Category == 'Kinsenas') {
+                    $taxDue /= 2;
+                }else {
+                    $taxDue /= 4;
+                }
+
+                // Update WTAXDeduction in payroll calculation
                 $newRecord['WTAXDeduction'] = $taxDue;
 
                 $TotalDeductions = $PagIbigDeduction + $SSSDeduction + $PhilHealthDeduction + $DeductionFee + $newRecord['SSSLoan'] + $newRecord['PagibigLoan'] + $newRecord['SalaryLoan'] + $newRecord['WTAXDeduction'] + $newRecord['TotalTardinessDed'] + $newRecord['TotalUndertimeDed'];
                 $newRecord['TotalDeductions'] = $TotalDeductions;
 
-                $TotalGovDeductions = $PagIbigDeduction + $SSSDeduction + $PhilHealthDeduction;
+                $TotalGovDeductions = $PagIbigDeduction + $SSSDeduction + $PhilHealthDeduction + $newRecord['WTAXDeduction'];
                 $newRecord['TotalGovDeductions'] = $TotalGovDeductions;
 
                 $TotalOfficeDeductions = $DeductionFee;
