@@ -721,6 +721,13 @@ class PayrollController extends Controller
             $taxDue = round($withholdingTax, 2);
 
             // Update WTAXDeduction in payroll calculation
+            if($weekPeriod->Category == 'Kinsenas') {
+                $taxDue /= 2;
+            }else {
+                $taxDue /= 4;
+            }
+
+            // Update WTAXDeduction in payroll calculation
             $newRecord['WTAXDeduction'] = $taxDue;
 
                 $tardiness = $newRecord['TotalTardinessDed'];
