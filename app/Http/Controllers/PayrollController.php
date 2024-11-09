@@ -140,13 +140,11 @@ class PayrollController extends Controller
             $TotalOvertimeHours = 0;
             $TotalOvertimePay = 0;
             $DeductionFee = 0;
-            $TotalTardinessDed = 0;
             $workedMorningHours = 0;
 						$workedAfternoonHours = 0;
 
             $TotalUndertime = 0;
             $TotalTardiness = 0;
-            $taxDue = 0;
 
             foreach ($finalAttendance as $attendances) {
                 // dd($attendances);
@@ -189,12 +187,8 @@ class PayrollController extends Controller
                         $afternoonEnd = Carbon::createFromTime($Out2Array[0], $Out2Array[1], $Out2Array[2]);  // 5:00 PM
 											if ($attendances["Checkin_One"] && $attendances["Checkout_One"]) {
                         // Calculate morning shift times (ignoring seconds)
-                        // $checkinOne = Carbon::createFromFormat('H:i', substr($attendances["Checkin_One"], 0, 5)) ?? Carbon::createFromTime(0, 0, 0);
-                        // $checkoutOne = Carbon::createFromFormat('H:i', substr($attendances["Checkout_One"], 0, 5)) ?? Carbon::createFromTime(0, 0, 0);
-
-                        $checkinOne = !empty($attendances["Checkin_One"]) && strlen($attendances["Checkin_One"]) >= 5 ? Carbon::createFromFormat('H:i', substr($attendances["Checkin_One"], 0, 5)) : Carbon::createFromTime(0, 0, 0);
-                            
-                        $checkoutOne = !empty($attendances["Checkout_One"]) && strlen($attendances["Checkout_One"]) >= 5 ? Carbon::createFromFormat('H:i', substr($attendances["Checkout_One"], 0, 5)) : Carbon::createFromTime(0, 0, 0);
+                        $checkinOne = Carbon::createFromFormat('H:i', substr($attendances["Checkin_One"], 0, 5));
+                        $checkoutOne = Carbon::createFromFormat('H:i', substr($attendances["Checkout_One"], 0, 5));
 
                         // Calculate late time for the morning (in hours)
                         // $lateMorningHours = $checkinOne->greaterThan($morningStart) ? $checkinOne->diffInMinutes($morningEnd) / 60 : 0;
@@ -210,12 +204,8 @@ class PayrollController extends Controller
 											}
 											if ($attendances["Checkin_Two"] && $attendances["Checkout_Two"]) {
                         // Calculate afternoon shift times (ignoring seconds)
-                        // $checkinTwo = Carbon::createFromFormat('H:i', substr($attendances["Checkin_Two"], 0, 5)) ?? Carbon::createFromTime(0, 0, 0);
-                        // $checkoutTwo = Carbon::createFromFormat('H:i', substr($attendances["Checkout_Two"], 0, 5)) ?? Carbon::createFromTime(0, 0, 0);
-
-                        $checkinTwo = !empty($attendances["Checkin_Two"]) && strlen($attendances["Checkin_Two"]) >= 5 ? Carbon::createFromFormat('H:i', substr($attendances["Checkin_Two"], 0, 5)) : Carbon::createFromTime(0, 0, 0);
-                            
-                        $checkoutTwo = !empty($attendances["Checkout_Two"]) && strlen($attendances["Checkout_Two"]) >= 5 ? Carbon::createFromFormat('H:i', substr($attendances["Checkout_Two"], 0, 5)) : Carbon::createFromTime(0, 0, 0);
+                        $checkinTwo = Carbon::createFromFormat('H:i', substr($attendances["Checkin_Two"], 0, 5));
+                        $checkoutTwo = Carbon::createFromFormat('H:i', substr($attendances["Checkout_Two"], 0, 5));
 
                         // Calculate late time for the afternoon (in hours)
                         $lateAfternoonHours = $checkinTwo->greaterThan($afternoonStart) ? $checkinTwo->diffInMinutes($afternoonEnd) / 60 : 0;
@@ -569,9 +559,9 @@ class PayrollController extends Controller
 
 
 
-            $GetSSS = \App\Models\sss::get();
+            $GetSSS = \App\Models\Sss::get();
 
-            $GetPagibig = \App\Models\pagibig::get();
+            $GetPagibig = \App\Models\Pagibig::get();
 
             $GetPhilHealth = \App\Models\philhealth::get();
 
@@ -625,24 +615,15 @@ class PayrollController extends Controller
                     }
 
                     // WTAX Deduction for Kinsenas
-                    // foreach ($GetWTAX as $wTax) {
-                    //     if ($wTax->MinSalary <= $employee->MonthlySalary && $wTax->MaxSalary >= $employee->MonthlySalary) {
-                    //         $excess = $employee->MonthlySalary - $wTax->MinSalary;
-                    //         $WTAXAnnual = $wTax->base_rate + ($excess * ($wTax->exceess_percent / 100));
-                    //         $WTAXDeduction = $WTAXAnnual / $deductionFactor; // Dividing by 12 for monthly and deductionFactor for Kinsenas
-                    //         $newRecord['WTAXDeduction'] = $WTAXDeduction;
-                    //         break;
-                    //     }
-                    // }
-
-                    $taxBrackets = [
-                        ['min' => 1, 'max' => 10417, 'compensation' => 10417, 'wth_tax' => 0, 'excess_rate' => 0],
-                        ['min' => 10417, 'max' => 16666, 'compensation' => 10417, 'wth_tax' => 0, 'excess_rate' => 0.15],
-                        ['min' => 16667, 'max' => 33332, 'compensation' => 16667, 'wth_tax' => 937.5, 'excess_rate' => 0.20],
-                        ['min' => 33333, 'max' => 83332, 'compensation' => 33333, 'wth_tax' => 4270.7, 'excess_rate' => 0.25],
-                        ['min' => 83333, 'max' => 333332, 'compensation' => 83333, 'wth_tax' => 16770.7, 'excess_rate' => 0.30],
-                        ['min' => 333333, 'max' => PHP_INT_MAX, 'compensation' => 333333, 'wth_tax' => 91770.7, 'excess_rate' => 0.35]
-                    ];
+                    foreach ($GetWTAX as $wTax) {
+                        if ($wTax->MinSalary <= $employee->MonthlySalary && $wTax->MaxSalary >= $employee->MonthlySalary) {
+                            $excess = $employee->MonthlySalary - $wTax->MinSalary;
+                            $WTAXAnnual = $wTax->base_rate + ($excess * ($wTax->exceess_percent / 100));
+                            $WTAXDeduction = $WTAXAnnual / $deductionFactor; // Dividing by 12 for monthly and deductionFactor for Kinsenas
+                            $newRecord['WTAXDeduction'] = $WTAXDeduction;
+                            break;
+                        }
+                    }
                 } elseif ($weekPeriod->Category == 'Weekly') {
                     // For Weekly (Week 1, Week 2, Week 3, or Week 4)
                     $deductionFactor = 4; // Weekly deductions are typically divided into 4 parts
@@ -688,19 +669,8 @@ class PayrollController extends Controller
                             break;
                         }
                     }
-                    
-
-
                 }
             }
-            // $taxBrackets = [
-            //     ['min' => 1, 'max' => 4808, 'compensation' => 4808, 'wth_tax' => 0, 'excess_rate' => 0],
-            //     ['min' => 4808, 'max' => 7961, 'compensation' => 4808, 'wth_tax' => 0, 'excess_rate' => 0.15],
-            //     ['min' => 7692, 'max' => 15384, 'compensation' => 7692, 'wth_tax' => 576.92, 'excess_rate' => 0.25],
-            //     ['min' => 15385, 'max' => 38461, 'compensation' => 15385, 'wth_tax' => 2500, 'excess_rate' => 0.30],
-            //     ['min' => 38462, 'max' => 153845, 'compensation' => 38462, 'wth_tax' => 9423.08, 'excess_rate' => 0.32],
-            //     ['min' => 153846, 'max' => PHP_INT_MAX, 'compensation' => 153846, 'wth_tax' => 46346.15, 'excess_rate' => 0.35]
-            // ];
             $taxBrackets = [
                 ['min' => 1, 'max' => 10417, 'compensation' => 10417, 'wth_tax' => 0, 'excess_rate' => 0],
                 ['min' => 10417, 'max' => 16666, 'compensation' => 10417, 'wth_tax' => 0, 'excess_rate' => 0.15],
@@ -709,7 +679,6 @@ class PayrollController extends Controller
                 ['min' => 83333, 'max' => 333332, 'compensation' => 83333, 'wth_tax' => 16770.7, 'excess_rate' => 0.30],
                 ['min' => 333333, 'max' => PHP_INT_MAX, 'compensation' => 333333, 'wth_tax' => 91770.7, 'excess_rate' => 0.35]
             ];
-            
             
 
             $newRecord['WTAXDeduction'] = $newRecord['WTAXDeduction'] ?? 0;
@@ -748,29 +717,23 @@ class PayrollController extends Controller
             }
             $taxDue = round($withholdingTax, 2);
 
-            // if($weekPeriod->Category == 'Kinsenas') {
-            //     $taxDue /= 2;
-            // }else {
-            //     $taxDue /= 4;
-            // }
-
             // Update WTAXDeduction in payroll calculation
             $newRecord['WTAXDeduction'] = $taxDue;
 
-                $tardiness = $newRecord['TotalTardinessDed'];
-                $undertime = $newRecord['TotalUndertimeDed'];
 
-                $TotalDeductions = $PagIbigDeduction + $SSSDeduction + $PhilHealthDeduction + $DeductionFee + $newRecord['SSSLoan'] + $newRecord['PagibigLoan'] + $newRecord['SalaryLoan'] + $taxDue + $tardiness + $undertime;
-                $newRecord['TotalDeductions'] = $TotalDeductions;
+            $TotalDeductions = $PagIbigDeduction + $SSSDeduction + $PhilHealthDeduction + $DeductionFee + $newRecord['SSSLoan'] + $newRecord['PagibigLoan'] + $newRecord['SalaryLoan'] + $newRecord['WTAXDeduction'] + $newRecord['TotalTardinessDed'] + $newRecord['TotalUndertimeDed'];
+            $newRecord['TotalDeductions'] = $TotalDeductions;
 
-                $TotalGovDeductions = $PagIbigDeduction + $SSSDeduction + $PhilHealthDeduction + $newRecord['WTAXDeduction'];
-                $newRecord['TotalGovDeductions'] = $TotalGovDeductions;
+           // dd($newRecord['TotalTardinessDed']);
 
-                $TotalOfficeDeductions = $DeductionFee;
-                $newRecord['TotalOfficeDeductions'] = $TotalOfficeDeductions;
+            $TotalGovDeductions = $PagIbigDeduction + $SSSDeduction + $PhilHealthDeduction + $newRecord['WTAXDeduction'];
+            $newRecord['TotalGovDeductions'] = $TotalGovDeductions;
 
-                $NetPay = $GrossPay - $TotalDeductions;
-                $newRecord['NetPay'] = $NetPay;
+            $TotalOfficeDeductions = $DeductionFee;
+            $newRecord['TotalOfficeDeductions'] = $TotalOfficeDeductions;
+
+            $NetPay = $GrossPay - $TotalDeductions;
+            $newRecord['NetPay'] = $NetPay;
             // dd(
             // 	$TotalHours,
             // 	'TotalHours',
