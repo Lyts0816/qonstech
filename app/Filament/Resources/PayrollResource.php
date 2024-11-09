@@ -65,7 +65,7 @@ class PayrollResource extends Resource
                         ->label('Assignment')
                         ->required(fn(string $context) => $context === 'create' || $context === 'edit')
                         ->options([
-                            'Main Office' => 'Bi-Monthly',
+                            'Main Office' => 'Kinsenas',
                             'Project Based' => 'Project Based',
                         ])
                         ->native(false)
