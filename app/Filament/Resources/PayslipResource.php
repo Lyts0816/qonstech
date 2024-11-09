@@ -158,7 +158,7 @@ class PayslipResource extends Resource
                             ->label('Payroll Frequency')
                             ->required(fn(string $context) => $context === 'create' || $context === 'edit')
                             ->options([
-                                'Kinsenas' => 'Kinsenas',
+                                'Kinsenas' => 'Bi-Monthly',
                                 'Weekly' => 'Weekly',
                             ])
                             ->native(false)
