@@ -19,6 +19,7 @@ class Earnings extends Model
         'Amount',
         'StartDate',
         'PeriodID',
+        'is_disbursed',
         
     ];
 

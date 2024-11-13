@@ -13,10 +13,13 @@ use Filament\Forms;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
+use Filament\Infolists\Components\Section as ComponentsSection;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -40,6 +43,8 @@ class EarningsResource extends Resource
         ->schema([
             Section::make('Earnings Information')
                 ->schema([
+                    
+
                     // Employee Select Field
                     Select::make('EmployeeID')
                     ->label('Employee')
@@ -100,6 +105,13 @@ class EarningsResource extends Resource
                     })
                     ->reactive() // Add reactivity here
                     ->required(fn (string $context) => $context === 'create'),
+
+                    Section::make('')
+                    ->schema([
+                        Toggle::make('is_disbursed')
+                        ->label('Disbursed')
+                        ->default(false),
+                    ]),
                 
                 ])
                 ->columns(2) // Set the layout to two columns for better UI alignment
@@ -114,6 +126,9 @@ public static function table(Table $table): Table
         ->columns([
             TextColumn::make('employee.full_name')
                 ->label('Employee'),
+
+            ToggleColumn::make('is_disbursed')
+                ->label('Disbursed'),
 
             TextColumn::make('EarningType')
                 ->label('Earning Type'),

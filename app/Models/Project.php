@@ -20,6 +20,7 @@ class Project extends Model
         'PR_Province',
         'StartDate',
         'EndDate',
+        'Status',
     ];
 
     public function employees()

@@ -163,7 +163,7 @@ class EmployeeResource extends Resource
                 ->schema([
                     TextInput::make('TaxIdentificationNumber')
                         ->label('Tax ID Number')
-                        ->required(fn (string $context) => $context === 'create' || $context === 'edit')
+                        
                         ->unique(ignoreRecord: true)
                         ->regex('/^[0-9]{9}$/') // Validates a 9-digit Tax ID number
                         ->numeric()
@@ -174,7 +174,7 @@ class EmployeeResource extends Resource
 
                     TextInput::make('SSSNumber')
                         ->label('SSS Number')
-                        ->required(fn (string $context) => $context === 'create' || $context === 'edit')
+                        
                         ->unique(ignoreRecord: true)
                         ->regex('/^[0-9]{10}$/') // Validates a 10-digit SSS number
                         ->numeric()
@@ -185,7 +185,7 @@ class EmployeeResource extends Resource
 
                     TextInput::make('PhilHealthNumber')
                         ->label('PhilHealth Number')
-                        ->required(fn (string $context) => $context === 'create' || $context === 'edit')
+                        
                         ->unique(ignoreRecord: true)
                         ->regex('/^[0-9]{12}$/') // Validates a 12-digit PhilHealth number
                         ->numeric()
@@ -196,7 +196,7 @@ class EmployeeResource extends Resource
 
                     TextInput::make('PagibigNumber')
                         ->label('Pagibig Number')
-                        ->required(fn (string $context) => $context === 'create' || $context === 'edit')
+                        
                         ->unique(ignoreRecord: true)
                         ->regex('/^[0-9]{12}$/') // Validates a 12-digit Pag-IBIG number
                         ->placeholder('Enter 12-digit Pag-IBIG Number')
