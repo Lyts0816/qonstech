@@ -70,7 +70,17 @@ class PositionResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                ->hidden(fn($record) => $record->trashed()),
+
+                Tables\Actions\DeleteAction::make()->label('Deactivate')
+                ->modalSubmitActionLabel('Deactivate')
+                ->modalHeading('Deactivate Position')
+                ->hidden(fn($record) => $record->trashed())
+                ->successNotificationTitle('Position Deactivated'),
+
+                Tables\Actions\ForceDeleteAction::make(),
+                Tables\Actions\RestoreAction::make(),
             ])
             ->bulkActions([
                 // Tables\Actions\BulkActionGroup::make([
@@ -85,6 +95,14 @@ class PositionResource extends Resource
             //
         ];
     }
+
+    public static function getEloquentQuery(): Builder
+	{
+		return parent::getEloquentQuery()
+			->withoutGlobalScopes([
+				SoftDeletingScope::class,
+			]);
+	}
 
     public static function getPages(): array
     {

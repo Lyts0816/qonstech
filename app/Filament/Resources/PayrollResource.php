@@ -65,7 +65,7 @@ class PayrollResource extends Resource
                         ->label('Assignment')
                         ->required(fn(string $context) => $context === 'create' || $context === 'edit')
                         ->options([
-                            'Main Office' => 'Main Office',
+                            'Main Office' => 'Kinsenas',
                             'Project Based' => 'Project Based',
                         ])
                         ->native(false)
@@ -268,6 +268,8 @@ class PayrollResource extends Resource
 						});
 					}),
 
+				
+
 				// SelectFilter::make('projectName')
 				// 	->label('Select Project')
 				// 	->options(Project::all()->pluck('ProjectName', 'id'))
@@ -285,6 +287,7 @@ class PayrollResource extends Resource
 			->actions([
 				// Tables\Actions\EditAction::make(),
 				Tables\Actions\Action::make('viewPayroll')
+				->hidden(fn($record) => $record->trashed())
 				->label('Generate Payroll Summary')
 				->icon('heroicon-o-calculator')
 				->color('success')
@@ -293,6 +296,14 @@ class PayrollResource extends Resource
 				->action(function () {
 					// No additional logic needed
 				}),
+
+				Tables\Actions\DeleteAction::make()->label('Archive')
+                    ->modalSubmitActionLabel('Archived')
+                    ->modalHeading('Archived Payroll')
+                    ->hidden(fn($record) => $record->trashed())
+                    ->successNotificationTitle('Payroll Archived'),
+
+                Tables\Actions\RestoreAction::make(),
 				// Tables\Actions\ViewAction::make(),
 				// Tables\Actions\Action::make('calculatePayroll')
 				// 	->label('Calculate & Export Payroll')
@@ -915,6 +926,14 @@ class PayrollResource extends Resource
 		return [
 			//
 		];
+	}
+
+	public static function getEloquentQuery(): Builder
+	{
+		return parent::getEloquentQuery()
+			->withoutGlobalScopes([
+				SoftDeletingScope::class,
+			]);
 	}
 
 	public static function getPages(): array

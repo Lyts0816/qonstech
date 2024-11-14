@@ -103,7 +103,17 @@ class HolidayResource extends Resource
 					->preload(),
 			])
 			->actions([
-				Tables\Actions\EditAction::make(),
+				Tables\Actions\EditAction::make()
+                ->hidden(fn($record) => $record->trashed()),
+
+                Tables\Actions\DeleteAction::make()->label('Deactivate')
+                ->modalSubmitActionLabel('Deactivate')
+                ->modalHeading('Deactivate Holiday')
+                ->hidden(fn($record) => $record->trashed())
+                ->successNotificationTitle('Holiday Deactivated'),
+
+                Tables\Actions\ForceDeleteAction::make(),
+                Tables\Actions\RestoreAction::make(),
 			])
 			->bulkActions([
 				// Tables\Actions\BulkActionGroup::make([
@@ -117,6 +127,14 @@ class HolidayResource extends Resource
 		return [
 			//
 		];
+	}
+
+	public static function getEloquentQuery(): Builder
+	{
+		return parent::getEloquentQuery()
+			->withoutGlobalScopes([
+				SoftDeletingScope::class,
+			]);
 	}
 
 	public static function getPages(): array

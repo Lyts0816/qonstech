@@ -120,7 +120,17 @@ class DeductionResource extends Resource
             // Add filters here if needed
         ])
         ->actions([
-            Tables\Actions\EditAction::make(),
+            Tables\Actions\EditAction::make()
+                ->hidden(fn($record) => $record->trashed()),
+
+                Tables\Actions\DeleteAction::make()->label('Deactivate')
+                ->modalSubmitActionLabel('Deactivate')
+                ->modalHeading('Deactivate Deduction')
+                ->hidden(fn($record) => $record->trashed())
+                ->successNotificationTitle('Deduction Deactivated'),
+
+                Tables\Actions\ForceDeleteAction::make(),
+                Tables\Actions\RestoreAction::make(),
         ])
         ->bulkActions([
             Tables\Actions\BulkActionGroup::make([
@@ -136,6 +146,14 @@ class DeductionResource extends Resource
             //
         ];
     }
+
+    public static function getEloquentQuery(): Builder
+	{
+		return parent::getEloquentQuery()
+			->withoutGlobalScopes([
+				SoftDeletingScope::class,
+			]);
+	}
 
     public static function getPages(): array
     {

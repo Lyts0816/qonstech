@@ -23,10 +23,10 @@ class ListUsers extends ListRecords
     {
         $tabs = [];
 
-        $tabs['activeEmployees'] = Tab::make('Active Employees')
-        ->badge(User::whereNull('deleted_at')->whereHas('employee')->count()) 
+        $tabs['activeEmployees'] = Tab::make('Active Users')
+        ->badge(User::whereNull('deleted_at')->count()) 
         ->modifyQueryUsing(function ($query) {
-            $query->whereNull('deleted_at')->whereHas('employee'); 
+            $query->whereNull('deleted_at'); 
         });
 
         $tabs['archived'] = Tab::make('Deactivated Users')

@@ -102,11 +102,11 @@ class UserResource extends Resource
                     ])
                     ->rules([
                         Rule::unique('users', 'role')->where(function ($query) {
-                            return $query->whereIn('role', ['Human Resource', 'Admin Vice President', 'Finance Vice President']);
+                            return $query->whereIn('role', ['Admin Vice President', 'Finance Vice President']);
                         })->whereNot('id', request()->route('record'))
                     ])
                     ->validationMessages([
-                        'unique' => 'Only one user with the Human Resource, Admin Vice President, or Finance Vice President role can be created.',
+                        'unique' => 'Only one user Admin Vice President, or Finance Vice President role can be created.',
                     ]), 
 
                     Fieldset::make('Password')

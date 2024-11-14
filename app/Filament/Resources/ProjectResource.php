@@ -28,6 +28,8 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
+use Carbon\Carbon;
+
 class ProjectResource extends Resource
 {
     protected static ?string $model = Project::class;
@@ -54,39 +56,54 @@ class ProjectResource extends Resource
                         ])
                         ->reactive()              // This triggers validation on each input change
                         ->debounce(500)           // Debounce to avoid rapid validation (500ms delay)
+                        ->disabled(fn ($get, $context) => $context === 'edit' && $get('status') !== 'Complete')
                         ->validationMessages([
                             'regex' => 'The project name must not contain any digits or special characters.',
                             'min' => 'The project name must be at least 3 characters long.',
                             'max' => 'The project name must not exceed 50 characters.'
                         ]),
+
+                        Select::make('Status')
+                        ->label('Project Status')
+                        ->options([
+                            'On going' => 'On going',
+                            'Incomplete' => 'Incomplete',
+                            'Complete' => 'Complete',
+                        ])
+                        ->required()
+                        ->reactive(),
                     
 
                     
                     Section::make('Location')
                     ->schema([
-                        TextInput::make('province')
-    ->label('Province')
-    ->required(fn (string $context) => $context === 'create' || 'edit')
-    ->placeholder('Enter province')
-    ->rules(['required', 'string', 'max:255']),
+                        TextInput::make('PR_Province')
+                        ->label('Province')
+                        ->required(fn (string $context) => $context === 'create' || 'edit')
+                        ->placeholder('Enter province')
+                        ->rules(['required', 'string', 'max:255'])
+                        ->disabled(fn ($get, $context) => $context === 'edit' && $get('status') !== 'Complete'),
 
-TextInput::make('city')
-    ->label('City')
-    ->required(fn (string $context) => $context === 'create' || 'edit')
-    ->placeholder('Enter city')
-    ->rules(['required', 'string', 'max:255']),
+                        TextInput::make('PR_City')
+                        ->label('City/Municipality')
+                        ->required(fn (string $context) => $context === 'create' || 'edit')
+                        ->placeholder('Enter city')
+                        ->rules(['required', 'string', 'max:255'])
+                        ->disabled(fn ($get, $context) => $context === 'edit' && $get('status') !== 'Complete'),
 
-TextInput::make('barangay')
-    ->label('Barangay')
-    ->required(fn (string $context) => $context === 'create' || 'edit')
-    ->placeholder('Enter barangay')
-    ->rules(['required', 'string', 'max:255']),
+                        TextInput::make('PR_Barangay')
+                        ->label('Barangay')
+                        ->required(fn (string $context) => $context === 'create' || 'edit')
+                        ->placeholder('Enter barangay')
+                        ->rules(['required', 'string', 'max:255'])
+                        ->disabled(fn ($get, $context) => $context === 'edit' && $get('status') !== 'Complete'),
 
-TextInput::make('street')
-    ->label('Street')
-    ->required(fn (string $context) => $context === 'create' || 'edit')
-    ->placeholder('Enter street')
-    ->rules(['required', 'string', 'max:255']),
+                        TextInput::make('PR_Street')
+                        ->label('Street')
+                        ->required(fn (string $context) => $context === 'create' || 'edit')
+                        ->placeholder('Enter street')
+                        ->rules(['required', 'string', 'max:255'])
+                        ->disabled(fn ($get, $context) => $context === 'edit' && $get('status') !== 'Complete'),
                     ])
                     ->columns(4)
                     ->collapsible(true),
@@ -95,11 +112,12 @@ TextInput::make('street')
                     ->schema([
                         DatePicker::make('StartDate')
                         ->label('Start Date')
+                        ->disabled(fn ($get, $context) => $context === 'edit' && $get('status') !== 'Complete')
                         ->required(fn (string $context) => $context === 'create')
                         ->rules([
                             'date', // Ensures the value is a valid date
                         ])
-                        ->minDate(now())
+                        ->minDate(fn (string $context) => $context === 'create' ? Carbon::today() : null) 
                         ->validationMessages([
                             'required' => 'The start date is required.',
                             'date' => 'The start date must be a valid date.',
@@ -107,6 +125,7 @@ TextInput::make('street')
 
                         DatePicker::make('EndDate')
                         ->label('End Date')
+                        ->disabled(fn ($get, $context) => $context === 'edit' && $get('status') !== 'Complete')
                         ->required(fn (string $context) => $context === 'create')
                         ->after('StartDate')
                         ->rules([
@@ -132,6 +151,7 @@ TextInput::make('street')
         return $table
             ->columns([
                 TextColumn::make('ProjectName')->searchable(),
+                TextColumn::make('Status')->label('Status'),
                 TextColumn::make('PR_Province')
                 ->label('Province')
                 ->searchable(),
@@ -146,7 +166,17 @@ TextInput::make('street')
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                ->hidden(fn($record) => $record->trashed()),
+
+                Tables\Actions\DeleteAction::make()->label('Deactivate')
+                ->modalSubmitActionLabel('Deactivate')
+                ->modalHeading('Deactivate Project')
+                ->hidden(fn($record) => $record->trashed())
+                ->successNotificationTitle('Project Deactivated'),
+
+                Tables\Actions\ForceDeleteAction::make(),
+                Tables\Actions\RestoreAction::make(),
 
                 
             ])
@@ -165,6 +195,14 @@ TextInput::make('street')
             EmployeesRelationManager::class
         ];
     }
+
+    public static function getEloquentQuery(): Builder
+{
+    return parent::getEloquentQuery()
+        ->withoutGlobalScopes([
+            SoftDeletingScope::class,
+        ]);
+}
 
     public static function getPages(): array
     {

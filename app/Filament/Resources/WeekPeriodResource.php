@@ -143,10 +143,10 @@ class WeekPeriodResource extends Resource
 
                 Forms\Components\DatePicker::make('StartDate')
                     ->required()
-                    ->label('Start Date')->readOnly(),
+                    ->label('Start Date'),
                 Forms\Components\DatePicker::make('EndDate')
                     ->required()
-                    ->label('End Date')->readOnly(),
+                    ->label('End Date'),
             ]);
     }
     

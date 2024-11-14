@@ -334,6 +334,7 @@ class ReportResource extends Resource
             ])
             ->actions([
                 Tables\Actions\Action::make('viewSummary')
+                    ->hidden(fn($record) => $record->trashed())
                     ->label('View Payslip')
                     ->color('success')
                     ->form([
@@ -384,6 +385,7 @@ class ReportResource extends Resource
 
 
                 Tables\Actions\Action::make('generateReport')
+                    ->hidden(fn($record) => $record->trashed())
                     ->label('Generate Report')
                     ->icon('heroicon-o-calculator')
                     ->color('info')
@@ -391,7 +393,14 @@ class ReportResource extends Resource
                     ->openUrlInNewTab()
                     ->visible(fn($record) => $record->ReportType != 'Payslip'),
 
+                
+                    Tables\Actions\DeleteAction::make()->label('Archive')
+                    ->modalSubmitActionLabel('Archived')
+                    ->modalHeading('Archived Report')
+                    ->hidden(fn($record) => $record->trashed())
+                    ->successNotificationTitle('Report Archived'),
 
+                    Tables\Actions\RestoreAction::make(),
                 // Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
@@ -407,6 +416,14 @@ class ReportResource extends Resource
             //
         ];
     }
+
+    public static function getEloquentQuery(): Builder
+	{
+		return parent::getEloquentQuery()
+			->withoutGlobalScopes([
+				SoftDeletingScope::class,
+			]);
+	}
 
     public static function getPages(): array
     {

@@ -65,25 +65,25 @@ class EmployeeResource extends Resource
 
                 Section::make('Address')
                 ->schema([
-                    TextInput::make('Province')
+                    TextInput::make('province')
                     ->label('Province')
                     ->required(fn (string $context) => $context === 'create' || $context === 'edit')
                     ->rules('regex:/^[^\d]*$/')
                     ->maxLength(30),
 
-                    TextInput::make('Municipality')
+                    TextInput::make('city')
                     ->label('Municipality')
                     ->required(fn (string $context) => $context === 'create' || $context === 'edit')
                     ->rules('regex:/^[^\d]*$/')
                     ->maxLength(30),
 
-                    TextInput::make('Barangay')
+                    TextInput::make('barangay')
                     ->label('Barangay')
                     ->required(fn (string $context) => $context === 'create' || $context === 'edit')
                     ->rules('regex:/^[^\d]*$/')
                     ->maxLength(30),
 
-                    TextInput::make('Street')
+                    TextInput::make('street')
                     ->label('Street')
                     ->required(fn (string $context) => $context === 'create' || $context === 'edit')
                     ->rules('regex:/^[^\d]*$/')
@@ -163,7 +163,7 @@ class EmployeeResource extends Resource
                 ->schema([
                     TextInput::make('TaxIdentificationNumber')
                         ->label('Tax ID Number')
-                        ->required(fn (string $context) => $context === 'create' || $context === 'edit')
+                        
                         ->unique(ignoreRecord: true)
                         ->regex('/^[0-9]{9}$/') // Validates a 9-digit Tax ID number
                         ->numeric()
@@ -174,7 +174,7 @@ class EmployeeResource extends Resource
 
                     TextInput::make('SSSNumber')
                         ->label('SSS Number')
-                        ->required(fn (string $context) => $context === 'create' || $context === 'edit')
+                        
                         ->unique(ignoreRecord: true)
                         ->regex('/^[0-9]{10}$/') // Validates a 10-digit SSS number
                         ->numeric()
@@ -185,7 +185,7 @@ class EmployeeResource extends Resource
 
                     TextInput::make('PhilHealthNumber')
                         ->label('PhilHealth Number')
-                        ->required(fn (string $context) => $context === 'create' || $context === 'edit')
+                        
                         ->unique(ignoreRecord: true)
                         ->regex('/^[0-9]{12}$/') // Validates a 12-digit PhilHealth number
                         ->numeric()
@@ -196,7 +196,7 @@ class EmployeeResource extends Resource
 
                     TextInput::make('PagibigNumber')
                         ->label('Pagibig Number')
-                        ->required(fn (string $context) => $context === 'create' || $context === 'edit')
+                        
                         ->unique(ignoreRecord: true)
                         ->regex('/^[0-9]{12}$/') // Validates a 12-digit Pag-IBIG number
                         ->placeholder('Enter 12-digit Pag-IBIG Number')
@@ -283,7 +283,17 @@ class EmployeeResource extends Resource
             ])//end of filter
 
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                ->hidden(fn($record) => $record->trashed()),
+
+                Tables\Actions\DeleteAction::make()->label('Deactivate')
+                ->modalSubmitActionLabel('Deactivate')
+                ->modalHeading('Deactivate Employee')
+                ->hidden(fn($record) => $record->trashed())
+                ->successNotificationTitle('Employee Deactivated'),
+
+                Tables\Actions\ForceDeleteAction::make(),
+                Tables\Actions\RestoreAction::make(),
             ])
 
             ->bulkActions([
@@ -356,6 +366,14 @@ class EmployeeResource extends Resource
             //
         ];
     }
+
+    public static function getEloquentQuery(): Builder
+{
+    return parent::getEloquentQuery()
+        ->withoutGlobalScopes([
+            SoftDeletingScope::class,
+        ]);
+}
 
     public static function getPages(): array
     {

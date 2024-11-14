@@ -168,9 +168,9 @@ class ReportsController extends Controller
 
 
             // Get SSS, Pagibig, and PhilHealth contributions
-            $GetSSS = \App\Models\Sss::get();
+            $GetSSS = \App\Models\sss::get();
 
-            $GetPagibig = \App\Models\Pagibig::get();
+            $GetPagibig = \App\Models\pagibig::get();
 
             $GetPhilHealth = \App\Models\philhealth::get();
 

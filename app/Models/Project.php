@@ -1,12 +1,13 @@
 <?php
 
 namespace App\Models;
-
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Project extends Model
 {
+    use SoftDeletes;
     use HasFactory;
 
     protected $table = 'projects';
@@ -19,6 +20,7 @@ class Project extends Model
         'PR_Province',
         'StartDate',
         'EndDate',
+        'Status',
     ];
 
     public function employees()

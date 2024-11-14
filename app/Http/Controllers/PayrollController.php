@@ -146,6 +146,9 @@ class PayrollController extends Controller
             $TotalUndertime = 0;
             $TotalTardiness = 0;
 
+            $newRecord['TotalTardinessDed'] = 0;
+            $newRecord['TotalUndertimeDed'] = 0;
+
             foreach ($finalAttendance as $attendances) {
                 // dd($attendances);
                 $attendanceDate = Carbon::parse($attendances['Date']);
@@ -559,9 +562,9 @@ class PayrollController extends Controller
 
 
 
-            $GetSSS = \App\Models\Sss::get();
+            $GetSSS = \App\Models\sss::get();
 
-            $GetPagibig = \App\Models\Pagibig::get();
+            $GetPagibig = \App\Models\pagibig::get();
 
             $GetPhilHealth = \App\Models\philhealth::get();
 
@@ -718,22 +721,29 @@ class PayrollController extends Controller
             $taxDue = round($withholdingTax, 2);
 
             // Update WTAXDeduction in payroll calculation
+            // if($weekPeriod->Category == 'Kinsenas') {
+            //     $taxDue /= 2;
+            // }else {
+            //     $taxDue /= 4;
+            // }
+
+            // Update WTAXDeduction in payroll calculation
             $newRecord['WTAXDeduction'] = $taxDue;
 
+                $tardiness = $newRecord['TotalTardinessDed'];
+                $undertime = $newRecord['TotalUndertimeDed'];
 
-            $TotalDeductions = $PagIbigDeduction + $SSSDeduction + $PhilHealthDeduction + $DeductionFee + $newRecord['SSSLoan'] + $newRecord['PagibigLoan'] + $newRecord['SalaryLoan'] + $newRecord['WTAXDeduction'] + $newRecord['TotalTardinessDed'] + $newRecord['TotalUndertimeDed'];
-            $newRecord['TotalDeductions'] = $TotalDeductions;
+                $TotalDeductions = $PagIbigDeduction + $SSSDeduction + $PhilHealthDeduction + $DeductionFee + $newRecord['SSSLoan'] + $newRecord['PagibigLoan'] + $newRecord['SalaryLoan'] + $newRecord['WTAXDeduction'] + $tardiness + $undertime;
+                $newRecord['TotalDeductions'] = $TotalDeductions;
 
-           // dd($newRecord['TotalTardinessDed']);
+                $TotalGovDeductions = $PagIbigDeduction + $SSSDeduction + $PhilHealthDeduction + $newRecord['WTAXDeduction'];
+                $newRecord['TotalGovDeductions'] = $TotalGovDeductions;
 
-            $TotalGovDeductions = $PagIbigDeduction + $SSSDeduction + $PhilHealthDeduction + $newRecord['WTAXDeduction'];
-            $newRecord['TotalGovDeductions'] = $TotalGovDeductions;
+                $TotalOfficeDeductions = $DeductionFee;
+                $newRecord['TotalOfficeDeductions'] = $TotalOfficeDeductions;
 
-            $TotalOfficeDeductions = $DeductionFee;
-            $newRecord['TotalOfficeDeductions'] = $TotalOfficeDeductions;
-
-            $NetPay = $GrossPay - $TotalDeductions;
-            $newRecord['NetPay'] = $NetPay;
+                $NetPay = $GrossPay - $TotalDeductions;
+                $newRecord['NetPay'] = $NetPay;
             // dd(
             // 	$TotalHours,
             // 	'TotalHours',
