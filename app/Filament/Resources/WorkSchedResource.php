@@ -81,6 +81,19 @@ class WorkSchedResource extends Resource
                                     $set('CheckoutOne', '00:00');
                                     $set('CheckinTwo', '00:00');
                                     $set('CheckoutTwo', '00:00');
+                                }else{
+                                    $set('RegularHours', 8);
+                                    $set('monday', 1);
+                                    $set('tuesday', 1);
+                                    $set('wednesday', 1);
+                                    $set('thursday', 1);
+                                    $set('friday', 1);
+                                    $set('saturday', 1);
+                                    $set('sunday', 0);
+                                    $set('CheckinOne', '08:00');
+                                    $set('CheckoutOne', '12:00');
+                                    $set('CheckinTwo', '13:00');
+                                    $set('CheckoutTwo', '17:00');
                                 }
                             })
                     ])->compact()->columns(),
@@ -106,7 +119,7 @@ class WorkSchedResource extends Resource
                     ])
                     ->compact()
                     ->columns(7)
-                    ->collapsible(true)->hidden(fn($get) => $get('ScheduleType') === 'Flexible'),
+                    ->collapsible(true)->hidden(fn($get) => $get('ScheduleType') === 'Fixed'),
 
                 Section::make('Shift Schedule')
 
