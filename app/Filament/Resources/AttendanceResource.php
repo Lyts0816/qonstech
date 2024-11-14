@@ -54,6 +54,8 @@ class AttendanceResource extends Resource
                 TextColumn::make('Checkout_One')->label('Morning Checkout'),
                 TextColumn::make('Checkin_Two')->label('Afternoon Check-in'),
                 TextColumn::make('Checkout_Two')->label('Afternoon Checkout'),
+                TextColumn::make('Overtime_In')->label('Overtime In'),
+                TextColumn::make('Overtime_Out')->label('Overtime Out'),
                 TextColumn::make('Total_Hours')->label('Total Hours')->sortable(),
             ])
             ->recordUrl(function ($record) {
@@ -104,7 +106,10 @@ class AttendanceResource extends Resource
                                     Session::put('selected_project_id', $data['selectedProjectId']);
                                     $query->where('ProjectID', $data['selectedProjectId']); // Make sure to use project_id for filtering
                                 } else {
-																		$query->where('ProjectID', 0)->orWhere('ProjectID', null); // Make sure to use project_id for filtering
+																		$query->where(function ($query) {
+																			$query->where('ProjectID', 0)
+																						->orWhereNull('ProjectID');
+																					}); // Make sure to use project_id for filtering
 																		Session::put('selected_project_id', null);
 																}
                                 return $query;

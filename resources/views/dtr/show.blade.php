@@ -76,10 +76,13 @@
                         <th>Morning Checkout</th>
                         <th>Afternoon Check-in</th>
                         <th>Afternoon Checkout</th>
+                        <th>Overtime In</th>
+                        <th>Overtime Out</th>
                         <th>Morning Late</th>
                         <th>Morning Undertime</th>
                         <th>Afternoon Late</th>
                         <th>Afternoon Undertime</th>
+                        <th>Total Worked Hours</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -90,16 +93,19 @@
                             <td>{{ $row['Checkout_One'] > 0 ? $row['Checkout_One'] : 0 }}</td>
                             <td>{{ $row['Checkin_Two'] > 0 ? $row['Checkin_Two'] : 0 }}</td>
                             <td>{{ $row['Checkout_Two'] > 0 ? $row['Checkout_Two'] : 0 }}</td>
+                            <td>{{ $row['Overtime_In'] > 0 ? $row['Overtime_In'] : 0 }}</td>
+                            <td>{{ $row['Overtime_Out'] > 0 ? $row['Overtime_Out'] : 0 }}</td>
                             <td>{{ $row['MorningTardy'] > 0 ? $row['MorningTardy'] : 0 }} mins</td>
                             <td>{{ $row['MorningUndertime'] > 0 ? $row['MorningUndertime'] : 0 }} mins</td>
                             <td>{{ $row['AfternoonTardy'] > 0 ? $row['AfternoonTardy'] : 0 }} mins</td>
                             <td>{{ $row['AfternoonUndertime'] > 0 ? $row['AfternoonUndertime'] : 0 }} mins</td>
+                            <td>{{ $row['TotalHours'] > 0 ? $row['TotalHours'] : 0 }} mins</td>
                         </tr>
                     @endforeach
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td colspan="5" style="text-align: right; font-weight: bold;">Total:</td>
+                        <td colspan="7" style="text-align: right; font-weight: bold;">Total:</td>
                         <td style="font-weight: bold;">
                             {{ collect($data)->sum('MorningTardy') }} mins
                         </td>
@@ -111,6 +117,9 @@
                         </td>
                         <td style="font-weight: bold;">
                             {{ collect($data)->sum('AfternoonUndertime') }} mins
+                        </td>
+                        <td style="font-weight: bold;">
+                            {{ collect($data)->sum('TotalHours') }} mins
                         </td>
                     </tr>
                 </tfoot>

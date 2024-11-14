@@ -39,10 +39,15 @@ class AttendanceController extends Controller
 					->get();
 			} else {
 				$data = Attendance::where('employee_id', $employeeId)
-					->whereNull('ProjectID')
-					->orWhere('ProjectID', 0)
+					->where(function ($query) {
+						$query->where('ProjectID', 0)
+									->orWhereNull('ProjectID');
+								})
+					
 					->whereBetween('Date', [$startDate, $endDate])
 					->orderBy('Date', 'asc')
+					// ->whereNull('ProjectID')
+					// ->orWhere('ProjectID', 0)
 					->get();
 			}
 
@@ -57,6 +62,8 @@ class AttendanceController extends Controller
 				$underTimeAfternoonMinutes = 0;
 				$workedMorningHours = 0;
 				$workedAfternoonHours = 0;
+				$totalOvertimeHours = 0;
+
 				foreach ($data as $attendances) {
 					$attendanceDate = Carbon::parse($attendances['Date']);
 
@@ -108,17 +115,88 @@ class AttendanceController extends Controller
 					$netWorkedHours = $totalWorkedHours;
 
 					$TotalHours += $netWorkedHours;
-					$attendances['TotalHours'] = $TotalHours;
+					$attendances['TotalHours'] = number_format($TotalHours, 2);
 					$attendances['MorningTardy'] = $tardinessMorningMinutes > 0 ? $tardinessMorningMinutes : 0;
 					$attendances['MorningUndertime'] = $underTimeMorningMinutes > 0 ? $underTimeMorningMinutes : 0;
 					$attendances['AfternoonTardy'] = $tardinessAfternoonMinutes > 0 ? $tardinessAfternoonMinutes : 0;
 					$attendances['AfternoonUndertime'] = $underTimeAfternoonMinutes > 0 ? $underTimeAfternoonMinutes : 0;
 
+					// Fetch approved overtime records for the employee within the selected week period
+					$approvedOvertimeRecords = \App\Models\Overtime::where('EmployeeID', $employee->id)
+					->get();
+
+					// Get the day of the week (e.g., 'monday', 'tuesday')
+					$dayOfWeek = strtolower(Carbon::parse($attendances->Date)->format('l'));
+
+					// Ensure that the employee has a schedule for the specific day
+					if (!empty($WorkSched[0]) && $WorkSched[0]->$dayOfWeek) {
+							// Parse the regular work hours (CheckinOne, CheckoutOne)
+							$workStart = Carbon::parse($WorkSched[0]->CheckinOne);
+							$workEnd = Carbon::parse($WorkSched[0]->CheckoutTwo);
+
+							// Attendance check-in and check-out times
+							$attendanceCheckin = Carbon::parse($attendances->Checkin_One);
+							$attendanceCheckout = Carbon::parse($attendances->Checkout_Two);
+
+							// Check if the employee has approved overtime for this date
+							$overtimeRecord = $approvedOvertimeRecords->firstWhere('Date', $attendances->Date);
+
+							if ($overtimeRecord) {
+									// Calculate overtime if attendance is outside regular work hours and there is an approved overtime schedule
+									$overtimeHoursForDay = 0;
+									$totalOvertimeHours = 2.5;
+
+									// Check if check-in is before regular work hours
+									if ($attendanceCheckin->lt($workStart)) {
+											$overtimeMinutesBefore = $attendanceCheckin->diffInMinutes($workStart);
+											$overtimeHoursForDay += $overtimeMinutesBefore / 60;
+									}
+
+									// Check if check-out is after regular work hours
+									if ($attendanceCheckout->gt($workEnd)) {
+											$overtimeMinutesAfter = $workEnd->diffInMinutes($attendanceCheckout);
+											$overtimeHoursForDay += $overtimeMinutesAfter / 60;
+									}
+
+									// If the attendance is outside regular work hours and overtime is approved, add to the total overtime hours
+									if ($overtimeHoursForDay > 0) {
+											$totalOvertimeHours = 2.5; // Add 2.5 hours for the break
+									}
+							}
+					}
+
+					// Additional check for overtime that is outside of regular work schedule
+					if ($approvedOvertimeRecords->contains('Date', $attendances->Date) && !$WorkSched[0]->$dayOfWeek) {
+							$overtimeRecord = $approvedOvertimeRecords->firstWhere('Date', $attendances->Date);
+							if ($overtimeRecord) {
+
+									$totalOvertimeHours = 2.5;
+									// Calculate total hours based on check-in and check-out times without work schedule comparison
+									$attendanceCheckin = Carbon::parse($attendances->Checkin_One);
+									$attendanceCheckout = Carbon::parse($attendances->Checkout_Two);
+
+									// Calculate the total overtime hours for the day
+									$overtimeHoursForDay = $attendanceCheckin->diffInMinutes($attendanceCheckout) / 60;
+
+									// Adjust for break if overtime exceeds 8 hours
+									if ($overtimeHoursForDay > 8) {
+											$overtimeHoursForDay -= 1; // Subtract 1 hour for the break
+									}
+
+									// Add to total overtime hours
+									if ($overtimeHoursForDay > 0) {
+											$totalOvertimeHours = 2.5;
+									}
+							}
+					}
+
+			// Store the total overtime hours in the new record
+			$attendances['TotalOvertimeHours'] = $totalOvertimeHours;
 				}
 				$payslipHtml .= view('dtr.show', ['employee' => $employee, 'data' => $data->toArray()])->render();
 			}
 			$dompdf->loadHtml($payslipHtml);
-			$dompdf->setPaper('Legal', 'portrait');
+			$dompdf->setPaper('Legal', 'landscape');
 			$dompdf->render();
 
 			return $dompdf->stream('Dtr.pdf', ['Attachment' => false]);
