@@ -77,25 +77,180 @@ class ProjectResource extends Resource
                     
                     Section::make('Location')
                     ->schema([
-                        TextInput::make('PR_Province')
-                        ->label('Province')
-                        ->required(fn (string $context) => $context === 'create' || 'edit')
-                        ->placeholder('Enter province')
-                        ->rules(['required', 'string', 'max:255'])
-                        ->disabled(fn ($get, $context) => $context === 'edit' && $get('status') !== 'Complete'),
+                        
+                        Select::make('PR_Province')
+                            ->label('Province')
+                            ->searchable()
+                            ->required(fn (string $context) => $context === 'create' || $context === 'edit')
+                            ->options([
+                                'Abra' => 'Abra',
+                                'Agusan del Norte' => 'Agusan del Norte',
+                                'Agusan del Sur' => 'Agusan del Sur',
+                                'Aklan' => 'Aklan',
+                                'Albay' => 'Albay',
+                                'Antique' => 'Antique',
+                                'Apayao' => 'Apayao',
+                                'Aurora' => 'Aurora',
+                                'Basilan' => 'Basilan',
+                                'Bataan' => 'Bataan',
+                                'Batanes' => 'Batanes',
+                                'Batangas' => 'Batangas',
+                                'Benguet' => 'Benguet',
+                                'Biliran' => 'Biliran',
+                                'Bohol' => 'Bohol',
+                                'Bukidnon' => 'Bukidnon',
+                                'Bulacan' => 'Bulacan',
+                                'Cagayan' => 'Cagayan',
+                                'Camarines Norte' => 'Camarines Norte',
+                                'Camarines Sur' => 'Camarines Sur',
+                                'Camiguin' => 'Camiguin',
+                                'Capiz' => 'Capiz',
+                                'Catanduanes' => 'Catanduanes',
+                                'Cavite' => 'Cavite',
+                                'Cebu' => 'Cebu',
+                                'Compostela Valley' => 'Compostela Valley',
+                                'Cotabato' => 'Cotabato',
+                                'Davao del Norte' => 'Davao del Norte',
+                                'Davao del Sur' => 'Davao del Sur',
+                                'Davao Occidental' => 'Davao Occidental',
+                                'Davao Oriental' => 'Davao Oriental',
+                                'Dinagat Islands' => 'Dinagat Islands',
+                                'Eastern Samar' => 'Eastern Samar',
+                                'Guimaras' => 'Guimaras',
+                                'Ifugao' => 'Ifugao',
+                                'Ilocos Norte' => 'Ilocos Norte',
+                                'Ilocos Sur' => 'Ilocos Sur',
+                                'Iloilo' => 'Iloilo',
+                                'Isabela' => 'Isabela',
+                                'Kalinga' => 'Kalinga',
+                                'La Union' => 'La Union',
+                                'Laguna' => 'Laguna',
+                                'Lanao del Norte' => 'Lanao del Norte',
+                                'Lanao del Sur' => 'Lanao del Sur',
+                                'Leyte' => 'Leyte',
+                                'Maguindanao' => 'Maguindanao',
+                                'Marinduque' => 'Marinduque',
+                                'Masbate' => 'Masbate',
+                                'Misamis Occidental' => 'Misamis Occidental',
+                                'Misamis Oriental' => 'Misamis Oriental',
+                                'Mountain Province' => 'Mountain Province',
+                                'Negros Occidental' => 'Negros Occidental',
+                                'Negros Oriental' => 'Negros Oriental',
+                                'Northern Samar' => 'Northern Samar',
+                                'Nueva Ecija' => 'Nueva Ecija',
+                                'Nueva Vizcaya' => 'Nueva Vizcaya',
+                                'Occidental Mindoro' => 'Occidental Mindoro',
+                                'Oriental Mindoro' => 'Oriental Mindoro',
+                                'Palawan' => 'Palawan',
+                                'Pampanga' => 'Pampanga',
+                                'Pangasinan' => 'Pangasinan',
+                                'Quezon' => 'Quezon',
+                                'Quirino' => 'Quirino',
+                                'Rizal' => 'Rizal',
+                                'Romblon' => 'Romblon',
+                                'Samar' => 'Samar',
+                                'Sarangani' => 'Sarangani',
+                                'Siquijor' => 'Siquijor',
+                                'Sorsogon' => 'Sorsogon',
+                                'South Cotabato' => 'South Cotabato',
+                                'Southern Leyte' => 'Southern Leyte',
+                                'Sultan Kudarat' => 'Sultan Kudarat',
+                                'Sulu' => 'Sulu',
+                                'Surigao del Norte' => 'Surigao del Norte',
+                                'Surigao del Sur' => 'Surigao del Sur',
+                                'Tarlac' => 'Tarlac',
+                                'Tawi-Tawi' => 'Tawi-Tawi',
+                                'Zambales' => 'Zambales',
+                                'Zamboanga del Norte' => 'Zamboanga del Norte',
+                                'Zamboanga del Sur' => 'Zamboanga del Sur',
+                                'Zamboanga Sibugay' => 'Zamboanga Sibugay',
+                            ])
+                            ->placeholder('Select a province')
+                            ->rules(['required', 'string', 'max:255'])
+                            ->disabled(fn ($get, $context) => $context === 'edit' && $get('status') !== 'Complete'),
 
-                        TextInput::make('PR_City')
-                        ->label('City/Municipality')
-                        ->required(fn (string $context) => $context === 'create' || 'edit')
-                        ->placeholder('Enter city')
-                        ->rules(['required', 'string', 'max:255'])
-                        ->disabled(fn ($get, $context) => $context === 'edit' && $get('status') !== 'Complete'),
+                            Select::make('PR_City')
+                            ->label('City/Municipality')
+                            ->searchable()
+                            ->required(fn (string $context) => $context === 'create' || $context === 'edit')
+                            ->options([
+                                'Alaminos' => 'Alaminos',
+                                'Angeles' => 'Angeles',
+                                'Antipolo' => 'Antipolo',
+                                'Bacolod' => 'Bacolod',
+                                'Baguio' => 'Baguio',
+                                'Bais' => 'Bais',
+                                'Balanga' => 'Balanga',
+                                'Banaue' => 'Banaue',
+                                'Basilan' => 'Basilan',
+                                'Batangas' => 'Batangas',
+                                'Bayawan' => 'Bayawan',
+                                'Bislig' => 'Bislig',
+                                'Bogo' => 'Bogo',
+                                'Butuan' => 'Butuan',
+                                'Cabanatuan' => 'Cabanatuan',
+                                'Cagayan de Oro' => 'Cagayan de Oro',
+                                'Caloocan' => 'Caloocan',
+                                'Cebu City' => 'Cebu City',
+                                'Cotabato City' => 'Cotabato City',
+                                'Dagupan' => 'Dagupan',
+                                'Davao City' => 'Davao City',
+                                'Digos' => 'Digos',
+                                'Dipolog' => 'Dipolog',
+                                'Iloilo City' => 'Iloilo City',
+                                'Iriga' => 'Iriga',
+                                'Kalibo' => 'Kalibo',
+                                'Las Piñas' => 'Las Piñas',
+                                'Lipa' => 'Lipa',
+                                'Makati' => 'Makati',
+                                'Malabon' => 'Malabon',
+                                'Mandaue' => 'Mandaue',
+                                'Manila' => 'Manila',
+                                'Marikina' => 'Marikina',
+                                'Meycauayan' => 'Meycauayan',
+                                'Muntinlupa' => 'Muntinlupa',
+                                'Navotas' => 'Navotas',
+                                'Olongapo' => 'Olongapo',
+                                'Ormoc' => 'Ormoc',
+                                'Pagadian' => 'Pagadian',
+                                'Panabo' => 'Panabo',
+                                'Pasay' => 'Pasay',
+                                'Pasig' => 'Pasig',
+                                'Puerto Princesa' => 'Puerto Princesa',
+                                'Quezon City' => 'Quezon City',
+                                'Tagbilaran' => 'Tagbilaran',
+                                'Taguig' => 'Taguig',
+                                'Tarlac City' => 'Tarlac City',
+                                'Tuguegarao' => 'Tuguegarao',
+                                'Zamboanga City' => 'Zamboanga City',
+                                'Baguio City' => 'Baguio City',
+                                'Talisay' => 'Talisay',
+                                'Bacolod City' => 'Bacolod City',
+                                'Cagayan De Oro City' => 'Cagayan De Oro City',
+                                'Davao Del Sur' => 'Davao Del Sur',
+                                'Dumaguete' => 'Dumaguete',
+                                'Iligan City' => 'Iligan City',
+                                'Tacloban' => 'Tacloban',
+                                'Taguig City' => 'Taguig City',
+                                'Zamboanga Del Sur' => 'Zamboanga Del Sur',
+                                'San Fernando' => 'San Fernando',
+                                'Meycauayan City' => 'Meycauayan City',
+                                'Bataan' => 'Bataan',
+                                'Cebu City' => 'Cebu City',
+                                'Muntinlupa City' => 'Muntinlupa City',
+                                'Pasig City' => 'Pasig City',
+                                // Add more cities as needed
+                            ])
+                            ->placeholder('Select a city')
+                            ->rules(['required', 'string', 'max:255'])
+                            ->disabled(fn ($get, $context) => $context === 'edit' && $get('status') !== 'Complete'),
+                        
 
-                        TextInput::make('PR_Barangay')
+                        Select::make('PR_Barangay')
                         ->label('Barangay')
+                        ->options([])
                         ->required(fn (string $context) => $context === 'create' || 'edit')
-                        ->placeholder('Enter barangay')
-                        ->rules(['required', 'string', 'max:255'])
+                        ->rules(['required'])
                         ->disabled(fn ($get, $context) => $context === 'edit' && $get('status') !== 'Complete'),
 
                         TextInput::make('PR_Street')
