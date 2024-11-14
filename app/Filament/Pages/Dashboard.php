@@ -12,7 +12,7 @@ class Dashboard extends \Filament\Pages\Dashboard
     // return  Auth::user()->role === User::ROLE_ADMIN || Auth::user()->role === User::ROLE_PROJECTCLERK;
     // }
 
-    protected static ?string $title = 'Home';
+    // protected static ?string $title = 'Home';
 
     
 }
