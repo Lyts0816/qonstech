@@ -13,15 +13,15 @@ class PayrollWidget extends BaseWidget
     protected function getStats(): array
     {
         return [
-            // Stat::make('Total Payroll Generated', Payroll::count())
-            // ->icon('heroicon-o-credit-card')
-            // ->color('success')
-            // ->description('Total payroll Generated for the month.'),
+            Stat::make('Total Payroll Generated', Payroll::count())
+            ->icon('heroicon-o-credit-card')
+            ->color('success')
+            ->description('Total payroll Generated for the month.'),
 
-            // Stat::make('Total Payslip Generated', Payslip::count())
-            // ->icon('heroicon-o-credit-card')
-            // ->color('success')
-            // ->description('Total amount of payslip generated for the month.'),
+            Stat::make('Total Payslip Generated', Payslip::count())
+            ->icon('heroicon-o-credit-card')
+            ->color('success')
+            ->description('Total amount of payslip generated for the month.'),
         ];
     }
 }
