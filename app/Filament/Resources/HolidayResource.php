@@ -62,8 +62,8 @@ class HolidayResource extends Resource
 							->label('Holiday Type')
 							->required(fn(string $context) => $context === 'create' || $context === 'edit')
 							->options([
-								'Regular' => 'Regular',
-								'Special' => 'Special'
+								'Regular' => 'Regular (200%)',
+								'Special' => 'Special (130%)',
 							])->native(false),
 
 						
