@@ -50,6 +50,7 @@ class UserResource extends Resource
                     }))
                     ->searchable()
                     ->reactive()
+                    ->unique(ignoreRecord: true)
                     ->afterStateUpdated(function (callable $set, $state) {
                         $employee = Employee::find($state);
                         if ($employee) {
