@@ -7,6 +7,7 @@ use App\Models\LoanDtl;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Dompdf\Options;
+use Illuminate\Support\Facades\Log;
 
 class PayslipController extends Controller
 {
@@ -888,10 +889,12 @@ class PayslipController extends Controller
             // Output the generated PDF to Browser
             return $dompdf->stream('payslips.pdf', ['Attachment' => false]);
         } catch (\Exception $e) {
-            \Log::error('Error in Work Schedule Processing: ' . $e->getMessage());
+            Log::error('Error in Work Schedule Processing: ' . $e->getMessage());
 
-            $errorMessage = urlencode($e->getMessage());
+            $errorMessage = urlencode('Employee Has no Work Schedule');
             echo "<script>window.open('/error-page?message={$errorMessage}', '_blank');</script>";
+            echo "<H1>Employee has no work schedule.</H1>";
+            echo "<H1>Check Employees Work Schedule.</H1>";
             exit;
         }
     }

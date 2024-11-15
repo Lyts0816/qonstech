@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use DatePeriod;
 use DateInterval;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 
 class PayrollController extends Controller
@@ -835,10 +836,12 @@ class PayrollController extends Controller
             return view('payroll.payroll-report', ['payrollData' => $payrollRecords]);
         } catch (\Exception $e) {
             // Log the error for debugging purposes
-            \Log::error('Error in Work Schedule Processing: ' . $e->getMessage());
+            Log::error('Error in Work Schedule Processing: ' . $e->getMessage());
 
             // Redirect to a new tab or a different landing page
             echo "<script>window.open('/error-page', '_blank');</script>";
+            echo "<H1>Employee has no work schedule.</H1>";
+            echo "<H1>Check Employees Work Schedule.</H1>";
             exit;
         }
     }
