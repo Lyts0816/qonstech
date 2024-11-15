@@ -895,6 +895,7 @@ class PayslipController extends Controller
             echo "<script>window.open('/error-page?message={$errorMessage}', '_blank');</script>";
             echo "<H1>Employee has no work schedule.</H1>";
             echo "<H1>Check Employees Work Schedule.</H1>";
+            echo "<button onclick=\"window.location.href='" . route('filament.admin.resources.employees.index') . "';\">Go to Employee Page</button>";
             exit;
         }
     }
