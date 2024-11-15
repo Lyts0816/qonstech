@@ -19,6 +19,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Fieldset;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Infolists\Components\Section as ComponentsSection;
 use Filament\Pages\Page;
@@ -28,6 +29,9 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Http;
+use Livewire\Livewire;
+use App\Livewire\BarangaySelect;
+use Illuminate\Support\Facades\DB;
 
 use Carbon\Carbon;
 
@@ -40,19 +44,6 @@ class ProjectResource extends Resource
     protected static ?int $navigationSort = 4;
     protected static ?string $navigationGroup = "Projects/Assign";
 
-    public $apiBrgy = [];
-
-    public function fetchBarangays($selectedCity)
-    {
-        if ($selectedCity) {
-            $this->apiBrgy = collect(Http::get("https://psgc.gitlab.io/api/cities-municipalities/{$selectedCity}/barangays/")->json())
-                ->sortBy('name') // assuming 'name' is the key for the barangay name
-                ->values()
-                ->toArray();
-        } else {
-            $this->apiBrgy = [];
-        }
-    }
 
     public static function form(Form $form): Form
     {
@@ -96,22 +87,26 @@ class ProjectResource extends Resource
                         Select::make('PR_Province')
                             ->label('Province')
                             ->searchable()
+                            ->preload()
                             ->required(fn (string $context) => $context === 'create' || $context === 'edit')
-                            ->options([
-                     
-                            ])
+                            ->options(function () {
+                                return DB::table('refprovince') // Adjust to your actual table name
+                                    ->pluck('provDesc', 'provDesc'); // Fetch 'provDesc' as the label and 'id' as the value
+                            })
                             ->placeholder('Select a province')
                             ->rules(['required', 'string', 'max:255'])
                             ->disabled(fn ($get, $context) => $context === 'edit' && $get('status') !== 'Complete'),
 
+
                             Select::make('PR_City')
                             ->label('City/Municipality')
                             ->searchable()
+                            ->preload()
                             ->required(fn (string $context) => $context === 'create' || $context === 'edit')
-                            ->options([
-             
-                                // Add more cities as needed
-                            ])
+                            ->options(function () {
+                                return DB::table('refcitymun') // Adjust to your actual table name
+                                    ->pluck('citymunDesc', 'citymunDesc'); // Fetch 'provDesc' as the label and 'id' as the value
+                            })
                             ->placeholder('Select a city')
                             ->rules(['required', 'string', 'max:255'])
                             ->disabled(fn ($get, $context) => $context === 'edit' && $get('status') !== 'Complete'),
@@ -119,19 +114,33 @@ class ProjectResource extends Resource
 
                             Select::make('PR_Barangay')
                             ->label('Barangay')
-                            ->options(function () {
-                                return collect($this->apiBrgy)->pluck('name', 'id')->toArray();
-                            })
+                            ->searchable()
+                            ->preload()
                             ->required(fn (string $context) => $context === 'create' || $context === 'edit')
-                            ->rules(['required'])
+                            ->options(function () {
+                                return DB::table('refbrgy') // Adjust to your actual table name
+                                    ->pluck('brgyDesc', 'brgyDesc'); // Fetch 'provDesc' as the label and 'id' as the value
+                            })
+                            // ->options(function ($get) {
+                            //     if (!$get('PR_Province')) {
+                            //         return []; // Return empty options if no province is selected
+                            //     }
+                        
+                            //     return DB::table('refbrgy') // Adjust to your actual table name
+                            //         ->where('regCode', $get('PR_Province')) // Adjust column name for province ID
+                            //         ->pluck('brgyDesc', 'brgyDesc'); // Adjust to the column names in your table
+                            // })
+                            ->placeholder('Select a province')
+                            ->rules(['required', 'string', 'max:255'])
                             ->disabled(fn ($get, $context) => $context === 'edit' && $get('status') !== 'Complete'),
 
-                        TextInput::make('PR_Street')
-                        ->label('Street')
-                        ->required(fn (string $context) => $context === 'create' || 'edit')
-                        ->placeholder('Enter street')
-                        ->rules(['required', 'string', 'max:255'])
-                        ->disabled(fn ($get, $context) => $context === 'edit' && $get('status') !== 'Complete'),
+
+                            TextInput::make('PR_Street')
+                            ->label('Street')
+                            ->required(fn (string $context) => $context === 'create' || 'edit')
+                            ->placeholder('Enter street')
+                            ->rules(['required', 'string', 'max:255'])
+                            ->disabled(fn ($get, $context) => $context === 'edit' && $get('status') !== 'Complete'),
                     ])
                     ->columns(4)
                     ->collapsible(true),

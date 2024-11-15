@@ -27,6 +27,7 @@ use Illuminate\Database\Eloquent\Factories\Relationship;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use PhpParser\Node\Stmt\Label;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class EmployeeResource extends Resource
 {
@@ -65,23 +66,35 @@ class EmployeeResource extends Resource
 
                 Section::make('Address')
                 ->schema([
-                    TextInput::make('province')
+                    Select::make('province')
                     ->label('Province')
+                    ->searchable()
+                    ->preload()
                     ->required(fn (string $context) => $context === 'create' || $context === 'edit')
-                    ->rules('regex:/^[^\d]*$/')
-                    ->maxLength(30),
+                    ->options(function () {
+                        return DB::table('refprovince') // Adjust to your actual table name
+                            ->pluck('provDesc', 'provDesc'); // Fetch 'provDesc' as the label and 'id' as the value
+                    }),
 
-                    TextInput::make('city')
+                    Select::make('city')
                     ->label('Municipality')
+                    ->searchable()
+                    ->preload()
                     ->required(fn (string $context) => $context === 'create' || $context === 'edit')
-                    ->rules('regex:/^[^\d]*$/')
-                    ->maxLength(30),
+                    ->options(function () {
+                        return DB::table('refcitymun') // Adjust to your actual table name
+                            ->pluck('citymunDesc', 'citymunDesc'); // Fetch 'provDesc' as the label and 'id' as the value
+                    }),
 
-                    TextInput::make('barangay')
+                    Select::make('barangay')
                     ->label('Barangay')
+                    ->searchable()
+                    ->preload()
                     ->required(fn (string $context) => $context === 'create' || $context === 'edit')
-                    ->rules('regex:/^[^\d]*$/')
-                    ->maxLength(30),
+                    ->options(function () {
+                        return DB::table('refbrgy') // Adjust to your actual table name
+                            ->pluck('brgyDesc', 'brgyDesc'); // Fetch 'provDesc' as the label and 'id' as the value
+                    }),
 
                     TextInput::make('street')
                     ->label('Street')
