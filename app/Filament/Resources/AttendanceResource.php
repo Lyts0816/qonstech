@@ -64,29 +64,36 @@ class AttendanceResource extends Resource
             ->filters(
                 [
                     Filter::make('employee_filter')
-                        ->form([
-                            Forms\Components\Grid::make()
-                                ->schema([
-                                    Forms\Components\Select::make('selectedEmployeeId')
-                                        ->label('Select Employee')
-                                        ->options(Employee::all()->pluck('full_name', 'id'))
-                                        ->extraAttributes(['class' => 'h-12 text-lg', 'style' => 'width: 100%;'])
-                                        ->required(),
-
-
-                                ])
-                                ->columns(1),
-                        ])
-                        ->query(
-                            function (Builder $query, array $data) {
-                                if (!empty($data['selectedEmployeeId'])) {
-                                    Session::put('selected_employee_id', $data['selectedEmployeeId']);
-                                    $query->where('employee_id', $data['selectedEmployeeId']);
-                                }
-
-                                return $query;
-                            }
-                        ),
+                    ->form([
+                        Forms\Components\Grid::make()
+                            ->schema([
+                                Forms\Components\Select::make('selectedEmployeeId')
+                                    ->label('Select Employee')
+                                    ->options(Employee::all()->pluck('full_name', 'id'))
+                                    ->extraAttributes(['class' => 'h-12 text-lg', 'style' => 'width: 100%;'])
+                                    ->reactive()
+                                    ->afterStateUpdated(function ($state) {
+                                        if (!empty($state)) {
+                                            Session::put('selected_employee_id', $state);
+                                        } else {
+                                            Session::forget('selected_employee_id');
+                                        }
+                                    })
+                                    ->required()
+                                    ->placeholder('Select an Employee'),
+                            ])
+                            ->columns(1),
+                    ])
+                    ->query(function (Builder $query, array $data) {
+                        if (!empty($data['selectedEmployeeId'])) {
+                            Session::put('selected_employee_id', $data['selectedEmployeeId']);
+                            $query->where('employee_id', $data['selectedEmployeeId']);
+                        } else {
+                            Session::forget('selected_employee_id');
+                        }
+                        return $query;
+                    }),
+                
 
                     Filter::make('project_filter')
                         ->form([
@@ -167,7 +174,20 @@ class AttendanceResource extends Resource
                         'endDate' => Session::get('endDate'),
                         'project_id' => Session::get('selected_project_id'),
                     ]))
-                    ->openUrlInNewTab(),
+                    ->openUrlInNewTab()
+                    ->disabled(function () {
+                        $selectedEmployee = Session::get('selected_employee_id');
+                        return empty($selectedEmployee);
+                    })->tooltip(function () {
+
+                        $selectedEmployee = Session::get('selected_employee_id');
+
+                        if (empty($selectedEmployee)) {
+                            return 'Please select an Employee to proceed';
+                        }
+
+                        return '';
+                    }),
                 Action::make('viewSummary')
                     ->openUrlInNewTab()
                     ->label('View Attendance Summary')
@@ -195,7 +215,7 @@ class AttendanceResource extends Resource
                     ->deselectRecordsAfterCompletion()
                     ->action(function (array $data) {
                         return redirect()->to(route('dtr.summary', [
-                            'payroll_id' => $data['SelectPayroll'], // Pass the selected payroll_id
+                            'payroll_id' => $data['SelectPayroll'], 
                         ]));
                     })
                     ->openUrlInNewTab()
