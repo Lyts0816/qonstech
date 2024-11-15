@@ -27,6 +27,11 @@ Route::get('/generate-reports', [ReportsController::class, 'generateReports'])->
 Route::get('/payroll-report', [PayrollController::class, 'showReport'])->name('payroll-report');
 Route::get('/transfer', [TransferController::class, 'runTransfer']);
 
+Route::get('/error-page', function (Illuminate\Http\Request $request) {
+    $errorMessage = $request->query('message', 'An unexpected error occurred.');
+    return view('error-page', ['message' => $errorMessage]);
+});
+
 Route::redirect('/', '/admin/login');
 
 
