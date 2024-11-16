@@ -171,80 +171,164 @@ class AttendanceResource extends Resource
             )
 
             ->headerActions([
-                Action::make('uploadBiometrics')
-                    ->label('Upload Biometrics')
-                    ->action(function ($record, $data) {
+                // Action::make('uploadBiometrics')
+                //     ->label('Upload Biometrics')
+                //     ->form(function (Forms\Form $form) {
+                //         return $form->schema([
+                //             Forms\Components\FileUpload::make('file')
+                //                 ->label('ZKTeco Biometrics File')
+                //                 ->required(),  
+                //         ]);
+                //     })
+                //     ->action(function ($record, $data) {
                   
-                        $file = $data['file'];
+                //         $file = $data['file'];
 
-                        $validator = Validator::make($data, [
-                            'file' => 'required|file|max:10240', 
-                        ]);
-                        if ($validator->fails()) {
-                            return back()->withErrors($validator)->withInput();
-                        }
+                //         $validator = Validator::make($data, [
+                //             'file' => 'required|file|max:10240', 
+                //         ]);
+                //         if ($validator->fails()) {
+                //             return back()->withErrors($validator)->withInput();
+                //         }
 
-                        $extension = $file->getClientOriginalExtension();
-                        if ($extension !== 'txt') {
-                            return back()->withErrors(['file' => 'The file must be a text file.'])->withInput();
-                        }
-                        $path = $file->storeAs('uploads', $file->getClientOriginalName());
+                //         $extension = $file->getClientOriginalExtension();
+                //         if ($extension !== 'txt') {
+                //             return back()->withErrors(['file' => 'The file must be a text file.'])->withInput();
+                //         }
+                //         $path = $file->storeAs('uploads', $file->getClientOriginalName());
 
-                        $content = Storage::get($path);
+                //         $content = Storage::get($path);
 
-                        $lines = explode("\n", $content);
+                //         $lines = explode("\n", $content);
 
-                        foreach ($lines as $index => $line) {
-                            if ($index == 0)
-                                continue; 
+                //         foreach ($lines as $index => $line) {
+                //             if ($index == 0)
+                //                 continue; 
             
-                                $columns = explode(',', $line);
+                //                 $columns = explode(',', $line);
 
-                            if (count($columns) >= 4) {
-                                $employeeId = $columns[0]; 
-                                $date = $columns[1];        
-                                $time = $columns[2];       
-                                $status = $columns[3];      
+                //             if (count($columns) >= 4) {
+                //                 $employeeId = $columns[0]; 
+                //                 $date = $columns[1];        
+                //                 $time = $columns[2];       
+                //                 $status = $columns[3];      
             
-                                $employee = Employee::where('Employee_ID', $employeeId)->first();
+                //                 $employee = Employee::where('Employee_ID', $employeeId)->first();
 
-                                if ($employee) {
-                                    $timestamp = Carbon::parse("$date $time");
+                //                 if ($employee) {
+                //                     $timestamp = Carbon::parse("$date $time");
 
-                                    $attendanceData = [
-                                        'Employee_ID' => $employee['id'],  
-                                    ];
-                                    if ($status == 'Check-in') {
-                                        if ($timestamp->between(Carbon::createFromTime(8, 0), Carbon::createFromTime(10, 0))) {
-                                            $attendanceData['Checkin_One'] = $timestamp;
-                                        } elseif ($timestamp->between(Carbon::createFromTime(12, 31), Carbon::createFromTime(13, 0))) {
-                                            $attendanceData['Checkin_Two'] = $timestamp;
-                                        }
-                                    } elseif ($status == 'Check-out') {
-                                        if ($timestamp->between(Carbon::createFromTime(12, 0), Carbon::createFromTime(12, 30))) {
-                                            $attendanceData['Checkout_One'] = $timestamp;
-                                        } elseif ($timestamp->gt(Carbon::createFromTime(13, 0))) {
-                                            $attendanceData['Checkout_Two'] = $timestamp;
-                                        }
-                                    }
-                                    if (isset($attendanceData['Checkin_One']) || isset($attendanceData['Checkout_One']) || isset($attendanceData['Checkin_Two']) || isset($attendanceData['Checkout_Two'])) {
-                                        Attendance::create($attendanceData); 
-                                    }
-                                }
+                //                     $attendanceData = [
+                //                         'Employee_ID' => $employee['id'],  
+                //                     ];
+                //                     if ($status == 'Check-in') {
+                //                         if ($timestamp->between(Carbon::createFromTime(8, 0), Carbon::createFromTime(10, 0))) {
+                //                             $attendanceData['Checkin_One'] = $timestamp;
+                //                         } elseif ($timestamp->between(Carbon::createFromTime(12, 31), Carbon::createFromTime(13, 0))) {
+                //                             $attendanceData['Checkin_Two'] = $timestamp;
+                //                         }
+                //                     } elseif ($status == 'Check-out') {
+                //                         if ($timestamp->between(Carbon::createFromTime(12, 0), Carbon::createFromTime(12, 30))) {
+                //                             $attendanceData['Checkout_One'] = $timestamp;
+                //                         } elseif ($timestamp->gt(Carbon::createFromTime(13, 0))) {
+                //                             $attendanceData['Checkout_Two'] = $timestamp;
+                //                         }
+                //                     }
+                //                     if (isset($attendanceData['Checkin_One']) || isset($attendanceData['Checkout_One']) || isset($attendanceData['Checkin_Two']) || isset($attendanceData['Checkout_Two'])) {
+                //                         Attendance::create($attendanceData); 
+                //                     }
+                //                 }
+                //             }
+                //         }
+
+                //         session()->flash('success', 'File uploaded and attendance data inserted successfully.');
+                //         return redirect()->back();  
+                //     })
+                //     ->color('info'),
+
+                Action::make('upload')
+                ->label('Upload Biometrics File')
+                ->form([
+                    Forms\Components\FileUpload::make('file')
+                    ->label('ZKTeco Biometrics File')
+                    ->required()
+                    ->acceptedFileTypes(['text/plain', 'application/octet-stream']),
+                ])
+                ->action(function (array $data) {
+                    // Process the uploaded file
+                    $uploadedFilePath = $data['file'];
+
+                    if (!$uploadedFilePath) {
+                        $this->notify('danger', 'No file uploaded!');
+                        return;
+                    }
+
+                    // Read the file content
+                    $fileContent = Storage::get($uploadedFilePath);
+
+                    // Split the content into lines
+                    $lines = explode(PHP_EOL, $fileContent);
+
+                    // Group data and save it to the attendance table
+                    $attendanceData = [];
+                    foreach ($lines as $line) {
+                        $data = str_getcsv($line);
+
+                        // Ensure valid data
+                        if (count($data) === 4) {
+                            [$employeeId, $date, $time, $status] = $data;
+
+                            // Group by Employee_ID and Date
+                            $attendanceData[$employeeId][$date][] = $time;
+                        }
+                    }
+
+                    foreach ($attendanceData as $employeeId => $dates) {
+                        foreach ($dates as $date => $times) {
+                            // Sort times for proper assignment
+                            sort($times);
+
+                            // Assign Check-in and Check-out times
+                            $checkinOne = $times[0] ?? null;
+                            $checkoutOne = $times[1] ?? null;
+                            $checkinTwo = $times[2] ?? null;
+                            $checkoutTwo = $times[3] ?? null;
+
+                            // Calculate total hours worked
+                            $totalHours = 0;
+                            if ($checkinOne && $checkoutOne) {
+                                $totalHours += Carbon::parse($checkoutOne)->diffInHours(Carbon::parse($checkinOne));
                             }
-                        }
+                            if ($checkinTwo && $checkoutTwo) {
+                                $totalHours += Carbon::parse($checkoutTwo)->diffInHours(Carbon::parse($checkinTwo));
+                            }
 
-                        session()->flash('success', 'File uploaded and attendance data inserted successfully.');
-                        return redirect()->back();  
-                    })
-                    ->form(function (Forms\Form $form) {
-                        return $form->schema([
-                            Forms\Components\FileUpload::make('file')
-                                ->label('ZKTeco Biometrics File')
-                                ->required(),  
-                        ]);
-                    })
-                    ->color('info'),
+                            // Save to the database
+                            \App\Models\Attendance::create([
+                                'Employee_ID' => $employeeId,
+                                'Checkin_One' => $checkinOne,
+                                'Checkout_One' => $checkoutOne,
+                                'Checkin_Two' => $checkinTwo,
+                                'Checkout_Two' => $checkoutTwo,
+                                'Date' => $date,
+                                'Total_Hours' => $totalHours,
+                                'overtime_in' => null, // Default to null
+                                'overtime_out' => null, // Default to null
+                            ]);
+                        }
+                    }
+
+                    // Optional: Clean up the uploaded file
+                    Storage::delete($uploadedFilePath);
+
+                    // Notify the user of success
+                    // $this->notify('success', 'Attendance data successfully uploaded and processed!');
+                })
+                ->modalHeading('Upload Biometrics File')
+                ->modalSubmitActionLabel('Process File'),
+
+                
+
 
                 Action::make('viewDtr')
                     ->label('View DTR')
