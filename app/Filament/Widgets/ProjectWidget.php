@@ -27,10 +27,10 @@ class ProjectWidget extends BaseWidget
             ->color('success')
             ->description('Total number of completed projects in the system.'),
 
-            Stat::make('Completed Projects', Project::where('status', 'Incomplete')->count())
+            Stat::make('Incomplete Projects', Project::where('status', 'Incomplete')->count())
             ->icon('heroicon-o-briefcase')
             ->color('success')
-            ->description('Total number of completed projects in the system.'),
+            ->description('Total number of incomplete projects in the system.'),
         ];
     }
 }
