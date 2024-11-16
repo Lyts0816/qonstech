@@ -22,7 +22,12 @@ class ProjectWidget extends BaseWidget
             ->color('success')
             ->description('Total number of on going projects in the system.'),
 
-            Stat::make('Completed Projects', Project::where('status', 'Completed')->count())
+            Stat::make('Completed Projects', Project::where('status', 'Complete')->count())
+            ->icon('heroicon-o-briefcase')
+            ->color('success')
+            ->description('Total number of completed projects in the system.'),
+
+            Stat::make('Completed Projects', Project::where('status', 'Incomplete')->count())
             ->icon('heroicon-o-briefcase')
             ->color('success')
             ->description('Total number of completed projects in the system.'),

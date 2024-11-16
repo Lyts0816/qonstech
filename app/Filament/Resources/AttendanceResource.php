@@ -252,7 +252,7 @@ class AttendanceResource extends Resource
                     Forms\Components\FileUpload::make('file')
                     ->label('ZKTeco Biometrics File')
                     ->required()
-                    ->acceptedFileTypes(['text/plain', 'application/octet-stream']),
+                    ->acceptedFileTypes(['text/plain']),
                 ])
                 ->action(function (array $data) {
                     // Process the uploaded file
