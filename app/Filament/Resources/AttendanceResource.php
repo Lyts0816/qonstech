@@ -174,24 +174,23 @@ class AttendanceResource extends Resource
                 Action::make('uploadBiometrics')
                     ->label('Upload Biometrics')
                     ->action(function ($record, $data) {
-
-                        $file = $data['file'];
-
                         $validator = Validator::make($data, [
-                            'file' => 'required|file|max:10240',
+                            'file' => 'required|string',
                         ]);
+                        // dd($validator);
                         if ($validator->fails()) {
                             return back()->withErrors($validator)->withInput();
                         }
+                        $filePath = $data['file'];
 
-                        $extension = $file->getClientOriginalExtension();
-                        if ($extension !== 'txt') {
-                            return back()->withErrors(['file' => 'The file must be a text file.'])->withInput();
+                        if (!Storage::exists($filePath)) {
+                            return back()->withErrors(['file' => 'The selected file does not exist.'])->withInput();
                         }
 
+                        $content = Storage::get($filePath);
+            
                         try {
-                            $path = $file->storeAs('uploads', $file->getClientOriginalName());
-                            $content = Storage::get($path);
+                            $content = Storage::get($filePath);
                             $lines = explode("\n", $content);
 
                             foreach ($lines as $index => $line) {
@@ -202,7 +201,6 @@ class AttendanceResource extends Resource
                                 try {
                                     $columns = explode(',', trim($line));
                                     logger()->info('Processing line columns:', $columns);
-
                                     if (count($columns) >= 4) {
                                         $employeeId = $columns[0];
                                         $date = $columns[1];
@@ -210,27 +208,34 @@ class AttendanceResource extends Resource
                                         $status = $columns[3];
 
                                         $employee = Employee::where('id', $employeeId)->first();
-
                                         if ($employee) {
-                                            $timestamp = Carbon::parse("$date $time");
 
                                             $attendanceData = [
                                                 'Employee_ID' => $employeeId,
                                                 'Date' => $date,
                                             ];
 
-                                            if ($status === 'Check-in') {
-                                                if ($timestamp->between(Carbon::createFromTime(8, 0), Carbon::createFromTime(10, 0))) {
-                                                    $attendanceData['Checkin_One'] = $timestamp->format('H:i:s');
-                                                } elseif ($timestamp->between(Carbon::createFromTime(12, 31), Carbon::createFromTime(13, 0))) {
-                                                    $attendanceData['Checkin_Two'] = $timestamp->format('H:i:s');
-                                                }
-                                            } elseif ($status === 'Check-out') {
-                                                if ($timestamp->between(Carbon::createFromTime(12, 0), Carbon::createFromTime(12, 30))) {
-                                                    $attendanceData['Checkout_One'] = $timestamp->format('H:i:s');
-                                                } elseif ($timestamp->gt(Carbon::createFromTime(13, 0))) {
-                                                    $attendanceData['Checkout_Two'] = $timestamp->format('H:i:s');
-                                                }
+                                            $timestamp = Carbon::parse("$date $time", 'Asia/Manila')->format('H:i:s');
+
+                                            $timestampCarbon = Carbon::parse($timestamp, 'Asia/Manila');
+
+                                            $checkinEnd = Carbon::createFromTime(10, 30, 0, 'Asia/Manila');  
+                                            $checkinTwoStart = Carbon::createFromTime(12, 31, 0, 'Asia/Manila'); 
+                                            $checkinTwoEnd = Carbon::createFromTime(15, 29, 0, 'Asia/Manila');   
+                                            $checkoutOneStart = Carbon::createFromTime(10, 31, 0, 'Asia/Manila'); 
+                                            $checkoutOneEnd = Carbon::createFromTime(12, 30, 0, 'Asia/Manila');  
+                                            $checkoutTwoStart = Carbon::createFromTime(15, 30, 0, 'Asia/Manila'); 
+            
+
+                                            if ($timestampCarbon->lt($checkinEnd)) {
+                                                // If timestamp is between 08:00 and 10:00
+                                                $attendanceData['Checkin_One'] = $timestampCarbon->format('H:i:s');
+                                            } elseif ($timestampCarbon->between($checkinTwoStart, $checkinTwoEnd)) {
+                                                $attendanceData['Checkin_Two'] = $timestampCarbon->format('H:i:s');
+                                            } elseif ($timestampCarbon->between($checkoutOneStart, $checkoutOneEnd)) {
+                                                $attendanceData['Checkout_One'] = $timestampCarbon->format('H:i:s');
+                                            } elseif ($timestampCarbon->gt($checkoutTwoStart)) {
+                                                $attendanceData['Checkout_Two'] = $timestampCarbon->format('H:i:s');
                                             }
                                             if (
                                                 isset($attendanceData['Checkin_One']) ||
@@ -241,7 +246,6 @@ class AttendanceResource extends Resource
                                                 $existingAttendance = Attendance::where('Employee_ID', $employeeId)
                                                     ->where('Date', $date)
                                                     ->first();
-
                                                 if ($existingAttendance) {
                                                     $existingAttendance->update(array_filter($attendanceData));
                                                 } else {
@@ -267,6 +271,8 @@ class AttendanceResource extends Resource
                         return $form->schema([
                             Forms\Components\FileUpload::make('file')
                                 ->label('ZKTeco Biometrics File')
+                                ->disk('local')
+                                ->directory('uploads')
                                 ->required(),
                         ]);
                     })
