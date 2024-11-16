@@ -174,11 +174,11 @@ class AttendanceResource extends Resource
                 Action::make('uploadBiometrics')
                     ->label('Upload Biometrics')
                     ->action(function ($record, $data) {
-                  
+
                         $file = $data['file'];
 
                         $validator = Validator::make($data, [
-                            'file' => 'required|file|max:10240', 
+                            'file' => 'required|file|max:10240',
                         ]);
                         if ($validator->fails()) {
                             return back()->withErrors($validator)->withInput();
@@ -188,60 +188,86 @@ class AttendanceResource extends Resource
                         if ($extension !== 'txt') {
                             return back()->withErrors(['file' => 'The file must be a text file.'])->withInput();
                         }
-                        $path = $file->storeAs('uploads', $file->getClientOriginalName());
 
-                        $content = Storage::get($path);
+                        try {
+                            $path = $file->storeAs('uploads', $file->getClientOriginalName());
+                            $content = Storage::get($path);
+                            $lines = explode("\n", $content);
 
-                        $lines = explode("\n", $content);
+                            foreach ($lines as $index => $line) {
+                                if ($index === 0 || empty(trim($line))) {
+                                    continue;
+                                }
 
-                        foreach ($lines as $index => $line) {
-                            if ($index == 0)
-                                continue; 
-            
-                                $columns = explode(',', $line);
+                                try {
+                                    $columns = explode(',', trim($line));
+                                    logger()->info('Processing line columns:', $columns);
 
-                            if (count($columns) >= 4) {
-                                $employeeId = $columns[0]; 
-                                $date = $columns[1];        
-                                $time = $columns[2];       
-                                $status = $columns[3];      
-            
-                                $employee = Employee::where('Employee_ID', $employeeId)->first();
+                                    if (count($columns) >= 4) {
+                                        $employeeId = $columns[0];
+                                        $date = $columns[1];
+                                        $time = $columns[2];
+                                        $status = $columns[3];
 
-                                if ($employee) {
-                                    $timestamp = Carbon::parse("$date $time");
+                                        $employee = Employee::where('id', $employeeId)->first();
 
-                                    $attendanceData = [
-                                        'Employee_ID' => $employee['id'],  
-                                    ];
-                                    if ($status == 'Check-in') {
-                                        if ($timestamp->between(Carbon::createFromTime(8, 0), Carbon::createFromTime(10, 0))) {
-                                            $attendanceData['Checkin_One'] = $timestamp;
-                                        } elseif ($timestamp->between(Carbon::createFromTime(12, 31), Carbon::createFromTime(13, 0))) {
-                                            $attendanceData['Checkin_Two'] = $timestamp;
-                                        }
-                                    } elseif ($status == 'Check-out') {
-                                        if ($timestamp->between(Carbon::createFromTime(12, 0), Carbon::createFromTime(12, 30))) {
-                                            $attendanceData['Checkout_One'] = $timestamp;
-                                        } elseif ($timestamp->gt(Carbon::createFromTime(13, 0))) {
-                                            $attendanceData['Checkout_Two'] = $timestamp;
+                                        if ($employee) {
+                                            $timestamp = Carbon::parse("$date $time");
+
+                                            $attendanceData = [
+                                                'Employee_ID' => $employeeId,
+                                                'Date' => $date,
+                                            ];
+
+                                            if ($status === 'Check-in') {
+                                                if ($timestamp->between(Carbon::createFromTime(8, 0), Carbon::createFromTime(10, 0))) {
+                                                    $attendanceData['Checkin_One'] = $timestamp->format('H:i:s');
+                                                } elseif ($timestamp->between(Carbon::createFromTime(12, 31), Carbon::createFromTime(13, 0))) {
+                                                    $attendanceData['Checkin_Two'] = $timestamp->format('H:i:s');
+                                                }
+                                            } elseif ($status === 'Check-out') {
+                                                if ($timestamp->between(Carbon::createFromTime(12, 0), Carbon::createFromTime(12, 30))) {
+                                                    $attendanceData['Checkout_One'] = $timestamp->format('H:i:s');
+                                                } elseif ($timestamp->gt(Carbon::createFromTime(13, 0))) {
+                                                    $attendanceData['Checkout_Two'] = $timestamp->format('H:i:s');
+                                                }
+                                            }
+                                            if (
+                                                isset($attendanceData['Checkin_One']) ||
+                                                isset($attendanceData['Checkout_One']) ||
+                                                isset($attendanceData['Checkin_Two']) ||
+                                                isset($attendanceData['Checkout_Two'])
+                                            ) {
+                                                $existingAttendance = Attendance::where('Employee_ID', $employeeId)
+                                                    ->where('Date', $date)
+                                                    ->first();
+
+                                                if ($existingAttendance) {
+                                                    $existingAttendance->update(array_filter($attendanceData));
+                                                } else {
+                                                    Attendance::create($attendanceData);
+                                                }
+                                            }
                                         }
                                     }
-                                    if (isset($attendanceData['Checkin_One']) || isset($attendanceData['Checkout_One']) || isset($attendanceData['Checkin_Two']) || isset($attendanceData['Checkout_Two'])) {
-                                        Attendance::create($attendanceData); 
-                                    }
+                                } catch (\Exception $e) {
+                                    logger()->error('Error processing line: ' . $line, ['error' => $e->getMessage()]);
                                 }
                             }
+
+                            session()->flash('success', 'File uploaded and attendance data inserted successfully.');
+                        } catch (\Exception $e) {
+                            logger()->error('File processing error:', ['error' => $e->getMessage()]);
+                            return back()->withErrors(['file' => 'An error occurred while processing the file. Please check the logs.'])->withInput();
                         }
 
-                        session()->flash('success', 'File uploaded and attendance data inserted successfully.');
-                        return redirect()->back();  
+                        return redirect()->back();
                     })
                     ->form(function (Forms\Form $form) {
                         return $form->schema([
                             Forms\Components\FileUpload::make('file')
                                 ->label('ZKTeco Biometrics File')
-                                ->required(),  
+                                ->required(),
                         ]);
                     })
                     ->color('info'),
