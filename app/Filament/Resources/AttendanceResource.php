@@ -197,15 +197,17 @@ class AttendanceResource extends Resource
                                 if ($index === 0 || empty(trim($line))) {
                                     continue;
                                 }
-
                                 try {
-                                    $columns = explode(',', trim($line));
+                                    $columns = preg_split('/\t+/', trim($line));
+                                    // dd($columns);
                                     logger()->info('Processing line columns:', $columns);
                                     if (count($columns) >= 4) {
                                         $employeeId = $columns[0];
-                                        $date = $columns[1];
-                                        $time = $columns[2];
-                                        $status = $columns[3];
+
+                                        $dateTime = explode(' ', $columns[1]);
+                                        $date = $dateTime[0];
+                                        $time = $dateTime[1]; 
+
 
                                         $employee = Employee::where('id', $employeeId)->first();
                                         if ($employee) {
@@ -228,7 +230,6 @@ class AttendanceResource extends Resource
             
 
                                             if ($timestampCarbon->lt($checkinEnd)) {
-                                                // If timestamp is between 08:00 and 10:00
                                                 $attendanceData['Checkin_One'] = $timestampCarbon->format('H:i:s');
                                             } elseif ($timestampCarbon->between($checkinTwoStart, $checkinTwoEnd)) {
                                                 $attendanceData['Checkin_Two'] = $timestampCarbon->format('H:i:s');
