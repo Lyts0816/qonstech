@@ -26,6 +26,8 @@ use Carbon\Carbon;
 use DateTime;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
 class PayrollResource extends Resource
 {
@@ -288,7 +290,7 @@ class PayrollResource extends Resource
 				// Tables\Actions\EditAction::make(),
 				Tables\Actions\Action::make('viewPayroll')
 				->hidden(fn($record) => $record->trashed())
-				->label('Generate Payroll Summary')
+				->label(fn() => in_array(Auth::user()->role, [User::ROLE_FIVP, User::ROLE_ADMINUSER]) ? 'View' : 'Generate Payroll Summary')
 				->icon('heroicon-o-calculator')
 				->color('success')
 				->url(fn($record) => route('payroll-report', $record->toArray())) // Pass all attributes from the record as an array

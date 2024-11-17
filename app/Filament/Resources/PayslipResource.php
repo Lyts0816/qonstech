@@ -31,6 +31,8 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\DB;
 use Filament\Tables\Actions\ButtonAction;
 use Filament\Forms\Components\Fieldset;
+use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
 class PayslipResource extends Resource
 {
@@ -329,7 +331,7 @@ class PayslipResource extends Resource
                 // Tables\Actions\EditAction::make(),
                 Tables\Actions\Action::make('viewPayslip')
                 ->hidden(fn($record) => $record->trashed())
-                ->label('View Payslip')
+                ->label(fn() => in_array(Auth::user()->role, [User::ROLE_FIVP, User::ROLE_ADMINUSER]) ? 'View' : 'View Payslip')
                 ->icon('heroicon-o-calculator')
                 ->color('info')
                 ->url(fn($record) => route('generate.payslips', ['record' => $record->toArray()])) // Pass the ProjectID

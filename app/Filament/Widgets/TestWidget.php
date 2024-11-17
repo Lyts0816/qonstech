@@ -15,11 +15,12 @@ use App\Models\User;
 class TestWidget extends BaseWidget
 {
 
-    protected static ?int $sort = 3;
+    protected static ?int $sort = 4;
 
     public static function canView(): bool
     {
-    return  Auth::user()->role === User::ROLE_PROJECTCLERK || Auth::user()->role === User::ROLE_ADMIN;
+    // return  Auth::user()->role === User::ROLE_PROJECTCLERK || Auth::user()->role === User::ROLE_ADMIN;
+    return false;
     }
 
     protected function getStats(): array

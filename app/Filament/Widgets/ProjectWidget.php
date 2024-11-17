@@ -10,11 +10,11 @@ use App\Models\User;
 
 class ProjectWidget extends BaseWidget
 {
-    protected static ?int $sort = 2;
+    protected static ?int $sort = 3;
 
     public static function canView(): bool
     {
-    return  Auth::user()->role === User::ROLE_PROJECTCLERK || Auth::user()->role === User::ROLE_ADMIN;
+        return false;
     }
 
     protected function getStats(): array
