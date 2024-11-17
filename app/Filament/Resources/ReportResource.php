@@ -33,6 +33,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Filament\Tables\Actions\ButtonAction;
 use Filament\Forms\Components\Fieldset;
+use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
 class ReportResource extends Resource
 {
@@ -386,7 +388,7 @@ class ReportResource extends Resource
 
                 Tables\Actions\Action::make('generateReport')
                     ->hidden(fn($record) => $record->trashed())
-                    ->label('Generate Report')
+                    ->label(fn() => in_array(Auth::user()->role, [User::ROLE_FIVP, User::ROLE_ADMINUSER]) ? 'View Report' : 'Generate Report')
                     ->icon('heroicon-o-calculator')
                     ->color('info')
                     ->url(fn($record) => route('generate.reports', $record->toArray()))
