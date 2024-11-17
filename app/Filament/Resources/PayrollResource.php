@@ -227,9 +227,11 @@ class PayrollResource extends Resource
 					->sortable(),	
 
 				Tables\Columns\TextColumn::make('PayrollYear')
+					->searchable()
 					->Label('Payroll Year'),
 
 				Tables\Columns\TextColumn::make('PayrollMonth')
+					->searchable()
 					->Label('Payroll Month'),
 
 				Tables\Columns\TextColumn::make('PayrollFrequency')
