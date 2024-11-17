@@ -188,46 +188,42 @@ class AttendanceResource extends Resource
                         }
 
                         $content = Storage::get($filePath);
-            
+
                         try {
                             $content = Storage::get($filePath);
                             $lines = explode("\n", $content);
 
                             foreach ($lines as $index => $line) {
-                                if ($index === 0 || empty(trim($line))) {
+                                if (empty(trim($line))) {
                                     continue;
                                 }
                                 try {
-                                    $columns = preg_split('/\t+/', trim($line));
-                                    // dd($columns);
+                                    $columns = preg_split('/\t+/', $line);
                                     logger()->info('Processing line columns:', $columns);
+
                                     if (count($columns) >= 4) {
                                         $employeeId = $columns[0];
 
                                         $dateTime = explode(' ', $columns[1]);
                                         $date = $dateTime[0];
-                                        $time = $dateTime[1]; 
-
+                                        $time = $dateTime[1];
 
                                         $employee = Employee::where('id', $employeeId)->first();
                                         if ($employee) {
-
                                             $attendanceData = [
                                                 'Employee_ID' => $employeeId,
                                                 'Date' => $date,
                                             ];
 
                                             $timestamp = Carbon::parse("$date $time", 'Asia/Manila')->format('H:i:s');
-
                                             $timestampCarbon = Carbon::parse($timestamp, 'Asia/Manila');
 
-                                            $checkinEnd = Carbon::createFromTime(10, 30, 0, 'Asia/Manila');  
-                                            $checkinTwoStart = Carbon::createFromTime(12, 31, 0, 'Asia/Manila'); 
-                                            $checkinTwoEnd = Carbon::createFromTime(15, 29, 0, 'Asia/Manila');   
-                                            $checkoutOneStart = Carbon::createFromTime(10, 31, 0, 'Asia/Manila'); 
-                                            $checkoutOneEnd = Carbon::createFromTime(12, 30, 0, 'Asia/Manila');  
-                                            $checkoutTwoStart = Carbon::createFromTime(15, 30, 0, 'Asia/Manila'); 
-            
+                                            $checkinEnd = Carbon::createFromTime(10, 30, 0, 'Asia/Manila');
+                                            $checkinTwoStart = Carbon::createFromTime(12, 31, 0, 'Asia/Manila');
+                                            $checkinTwoEnd = Carbon::createFromTime(15, 29, 0, 'Asia/Manila');
+                                            $checkoutOneStart = Carbon::createFromTime(10, 31, 0, 'Asia/Manila');
+                                            $checkoutOneEnd = Carbon::createFromTime(12, 30, 0, 'Asia/Manila');
+                                            $checkoutTwoStart = Carbon::createFromTime(15, 30, 0, 'Asia/Manila');
 
                                             if ($timestampCarbon->lt($checkinEnd)) {
                                                 $attendanceData['Checkin_One'] = $timestampCarbon->format('H:i:s');
@@ -238,6 +234,7 @@ class AttendanceResource extends Resource
                                             } elseif ($timestampCarbon->gt($checkoutTwoStart)) {
                                                 $attendanceData['Checkout_Two'] = $timestampCarbon->format('H:i:s');
                                             }
+
                                             if (
                                                 isset($attendanceData['Checkin_One']) ||
                                                 isset($attendanceData['Checkout_One']) ||
