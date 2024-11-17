@@ -47,7 +47,7 @@ class PositionResource extends Resource
             ->reactive() 
             ->afterStateUpdated(function (callable $set, $state) {
                 
-                $monthlySalary = $state * 8 * 22; 
+                $monthlySalary = $state * 8 * 26; 
                 $set('MonthlySalary', $monthlySalary); 
             }),
 
