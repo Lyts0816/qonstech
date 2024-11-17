@@ -33,4 +33,20 @@ class Project extends Model
         return $this->hasMany(Payroll::class);
     }
 
+    public function province()
+    {
+        return $this->belongsTo(Province::class, 'PR_Province', 'provDesc'); // Maps the name directly
+    }
+
+    public function city()
+    {
+        return $this->belongsTo(City::class, 'PR_City', 'citymunDesc');
+    }
+
+    public function barangay()
+    {
+        return $this->belongsTo(Barangay::class, 'PR_Barangay', 'brgyDesc');
+    }
+
+
 }

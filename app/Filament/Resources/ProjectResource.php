@@ -83,62 +83,61 @@ class ProjectResource extends Resource
                     
                     Section::make('Location')
                     ->schema([
-                        
                         Select::make('PR_Province')
-                            ->label('Province')
-                            ->searchable()
-                            ->preload()
-                            ->required(fn (string $context) => $context === 'create' || $context === 'edit')
-                            ->options(function () {
-                                return DB::table('refprovince') // Adjust to your actual table name
-                                    ->pluck('provDesc', 'provDesc'); // Fetch 'provDesc' as the label and 'id' as the value
-                            })
-                            ->placeholder('Select a province')
-                            ->rules(['required', 'string', 'max:255'])
-                            ->disabled(fn ($get, $context) => $context === 'edit' && $get('status') !== 'Complete'),
+                        ->label('Province')
+                        ->searchable()
+                        ->preload()
+                        ->required(fn (string $context) => $context === 'create' || $context === 'edit')
+                        ->options(function () {
+                            return DB::table('refprovince')
+                                ->pluck('provDesc', 'provCode'); // Use provCode as value and provDesc as label
+                        })
+                        ->placeholder('Select a Province')
+                        ->rules(['required', 'string', 'max:255'])
+                        ->reactive(), 
 
+                        Select::make('PR_City')
+                        ->label('City/Municipality')
+                        ->searchable()
+                        ->preload()
+                        ->required(fn (string $context) => $context === 'create' || $context === 'edit')
+                        ->options(function ($get) {
+                            $provinceCode = $get('PR_Province'); // Get the selected province code
+                            if (!$provinceCode) {
+                                return [];
+                            }
 
-                            Select::make('PR_City')
-                            ->label('City/Municipality')
-                            ->searchable()
-                            ->preload()
-                            ->required(fn (string $context) => $context === 'create' || $context === 'edit')
-                            ->options(function () {
-                                return DB::table('refcitymun') // Adjust to your actual table name
-                                    ->pluck('citymunDesc', 'citymunDesc'); // Fetch 'provDesc' as the label and 'id' as the value
-                            })
-                            ->placeholder('Select a city')
-                            ->rules(['required', 'string', 'max:255'])
-                            ->disabled(fn ($get, $context) => $context === 'edit' && $get('status') !== 'Complete'),
-                        
+                            return DB::table('refcitymun')
+                                ->where('provCode', $provinceCode) // Filter by province code
+                                ->pluck('citymunDesc', 'citymunCode'); // Use citymunCode as value and citymunDesc as label
+                        })
+                        ->placeholder('Select a City')
+                        ->rules(['required', 'string', 'max:255'])
+                        ->reactive(), // Make the field reactive
 
-                            Select::make('PR_Barangay')
-                            ->label('Barangay')
-                            ->searchable()
-                            ->preload()
-                            ->required(fn (string $context) => $context === 'create' || $context === 'edit')
-                            ->options(function () {
-                                return DB::table('refbrgy') // Adjust to your actual table name
-                                    ->pluck('brgyDesc', 'brgyDesc'); // Fetch 'provDesc' as the label and 'id' as the value
-                            })
-                            // ->options(function ($get) {
-                            //     if (!$get('PR_Province')) {
-                            //         return []; // Return empty options if no province is selected
-                            //     }
-                        
-                            //     return DB::table('refbrgy') // Adjust to your actual table name
-                            //         ->where('regCode', $get('PR_Province')) // Adjust column name for province ID
-                            //         ->pluck('brgyDesc', 'brgyDesc'); // Adjust to the column names in your table
-                            // })
-                            ->placeholder('Select a province')
-                            ->rules(['required', 'string', 'max:255'])
-                            ->disabled(fn ($get, $context) => $context === 'edit' && $get('status') !== 'Complete'),
+                        Select::make('PR_Barangay')
+                        ->label('Barangay')
+                        ->searchable()
+                        ->preload()
+                        ->required(fn (string $context) => $context === 'create' || $context === 'edit')
+                        ->options(function ($get) {
+                            $cityCode = $get('PR_City'); // Get the selected city code
+                            if (!$cityCode) {
+                                return [];
+                            }
+
+                            return DB::table('refbrgy')
+                                ->where('citymunCode', $cityCode) // Filter by city code
+                                ->pluck('brgyDesc', 'brgyCode'); // Use brgyCode as value and brgyDesc as label
+                        })
+                        ->placeholder('Select a Barangay')
+                        ->rules(['required', 'string', 'max:255']),
 
 
                             TextInput::make('PR_Street')
                             ->label('Street')
                             ->required(fn (string $context) => $context === 'create' || 'edit')
-                            ->placeholder('Enter street')
+                            ->placeholder('Enter Street')
                             ->rules(['required', 'string', 'max:255'])
                             ->disabled(fn ($get, $context) => $context === 'edit' && $get('status') !== 'Complete'),
                     ])
@@ -192,9 +191,28 @@ class ProjectResource extends Resource
                 TextColumn::make('Status')->label('Status'),
                 TextColumn::make('PR_Province')
                 ->label('Province')
-                ->searchable(),
-                TextColumn::make('PR_City')->label('City'),
-                TextColumn::make('PR_Barangay')->label('Barangay'),
+                ->searchable()
+                ->formatStateUsing(function ($state) {
+                    return DB::table('refprovince')
+                        ->where('provCode', $state) // Match the stored province code
+                        ->value('provDesc');       // Get the province name
+                }),
+
+                TextColumn::make('PR_City')
+                ->label('City')
+                ->formatStateUsing(function ($state) {
+                    return DB::table('refcitymun')
+                        ->where('citymunCode', $state) // Match the stored city code
+                        ->value('citymunDesc');        // Get the city name
+                }),
+
+                TextColumn::make('PR_Barangay')
+                ->label('Barangay')
+                ->formatStateUsing(function ($state) {
+                    return DB::table('refbrgy')
+                        ->where('brgyCode', $state)   // Match the stored barangay code
+                        ->value('brgyDesc');          // Get the barangay name
+                }),
                 TextColumn::make('PR_Street')->label('Street'),
                 TextColumn::make('StartDate'),
                 TextColumn::make('EndDate'),

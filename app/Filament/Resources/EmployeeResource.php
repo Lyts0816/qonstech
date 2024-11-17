@@ -72,35 +72,57 @@ class EmployeeResource extends Resource
                     ->preload()
                     ->required(fn (string $context) => $context === 'create' || $context === 'edit')
                     ->options(function () {
-                        return DB::table('refprovince') // Adjust to your actual table name
-                            ->pluck('provDesc', 'provDesc'); // Fetch 'provDesc' as the label and 'id' as the value
-                    }),
+                        return DB::table('refprovince')
+                            ->pluck('provDesc', 'provCode'); // Use provCode as value and provDesc as label
+                    })
+                    ->placeholder('Select a Province')
+                    ->rules(['required', 'string', 'max:255'])
+                    ->reactive(), 
 
                     Select::make('city')
-                    ->label('Municipality')
+                    ->label('City/Municipality')
                     ->searchable()
                     ->preload()
                     ->required(fn (string $context) => $context === 'create' || $context === 'edit')
-                    ->options(function () {
-                        return DB::table('refcitymun') // Adjust to your actual table name
-                            ->pluck('citymunDesc', 'citymunDesc'); // Fetch 'provDesc' as the label and 'id' as the value
-                    }),
+                    ->options(function ($get) {
+                        $provinceCode = $get('province'); // Get the selected province code
+                        if (!$provinceCode) {
+                            return [];
+                        }
+
+                        return DB::table('refcitymun')
+                            ->where('provCode', $provinceCode) // Filter by province code
+                            ->pluck('citymunDesc', 'citymunCode'); // Use citymunCode as value and citymunDesc as label
+                    })
+                    ->placeholder('Select a City')
+                    ->rules(['required', 'string', 'max:255'])
+                    ->reactive(), // Make the field reactive
 
                     Select::make('barangay')
                     ->label('Barangay')
                     ->searchable()
                     ->preload()
                     ->required(fn (string $context) => $context === 'create' || $context === 'edit')
-                    ->options(function () {
-                        return DB::table('refbrgy') // Adjust to your actual table name
-                            ->pluck('brgyDesc', 'brgyDesc'); // Fetch 'provDesc' as the label and 'id' as the value
-                    }),
+                    ->options(function ($get) {
+                        $cityCode = $get('city'); // Get the selected city code
+                        if (!$cityCode) {
+                            return [];
+                        }
+
+                        return DB::table('refbrgy')
+                            ->where('citymunCode', $cityCode) // Filter by city code
+                            ->pluck('brgyDesc', 'brgyCode'); // Use brgyCode as value and brgyDesc as label
+                    })
+                    ->placeholder('Select a Barangay')
+                    ->rules(['required', 'string', 'max:255']),
+
 
                     TextInput::make('street')
                     ->label('Street')
-                    ->required(fn (string $context) => $context === 'create' || $context === 'edit')
-                    ->rules('regex:/^[^\d]*$/')
-                    ->maxLength(30),
+                    ->required(fn (string $context) => $context === 'create' || 'edit')
+                    ->placeholder('Enter Street')
+                    ->rules(['required', 'string', 'max:255'])
+                    ->disabled(fn ($get, $context) => $context === 'edit' && $get('status') !== 'Complete'),
                 ])->columns(4)->collapsible(true),
 
 								Section::make(heading: 'Employment Details')
@@ -236,9 +258,41 @@ class EmployeeResource extends Resource
                 ->searchable(['first_name', 'middle_name', 'last_name'])
                 ,
 
-                TextColumn::make('full_address')
-                ->label('Address')
-                ->formatStateUsing(fn ($record) => $record->full_address),
+                // TextColumn::make('full_address')
+                // ->label('Address')
+                // ->formatStateUsing(fn ($record) => $record->full_address),
+                TextColumn::make('province')
+                ->label('Province')
+                ->searchable()
+                ->formatStateUsing(function ($state) {
+                    return DB::table('refprovince')
+                        ->where('provCode', $state) // Match the stored province code
+                        ->value('provDesc');       // Get the province name
+                }),
+
+                TextColumn::make('city')
+                ->label('City')
+                ->formatStateUsing(function ($state) {
+                    return DB::table('refcitymun')
+                        ->where('citymunCode', $state) // Match the stored city code
+                        ->value('citymunDesc');        // Get the city name
+                }),
+
+                TextColumn::make('barangay')
+                ->label('Barangay')
+                ->formatStateUsing(function ($state) {
+                    return DB::table('refbrgy')
+                        ->where('brgyCode', $state)   // Match the stored barangay code
+                        ->value('brgyDesc');          // Get the barangay name
+                }),
+
+                TextColumn::make('street')
+                ->label('Street'),
+
+
+
+
+
 
                 TextColumn::make('TaxIdentificationNumber')->label('Tax Number'),
                 TextColumn::make('SSSNumber')->label('SSS Number'),
