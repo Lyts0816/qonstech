@@ -165,7 +165,7 @@ class PayrollResource extends Resource
 
             // weekPeriodID Select Field
             Select::make('weekPeriodID')
-                ->label('Period')
+                ->label('Payroll Period')
                 ->required(fn(string $context) => $context === 'create' || $context === 'edit')
                 ->options(function (callable $get) {
                     // Fetch selected values from other fields
@@ -238,7 +238,7 @@ class PayrollResource extends Resource
 					->Label('Payroll Frequency'),
 
 				Tables\Columns\TextColumn::make('PayrollDate2')
-					->label('Payroll Dates')
+					->label('Payroll Period')
 					->searchable()
 					->sortable(),
 
