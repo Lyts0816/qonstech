@@ -125,13 +125,15 @@ public static function table(Table $table): Table
     return $table
         ->columns([
             TextColumn::make('employee.full_name')
-                ->label('Employee'),
+                ->label('Employee')
+                ->searchable(['employees.first_name', 'employees.middle_name', 'employees.last_name']),
 
             ToggleColumn::make('is_disbursed')
                 ->label('Disbursed'),
 
             TextColumn::make('EarningType')
-                ->label('Earning Type'),
+                ->label('Earning Type')
+                ->searchable(),
 
             TextColumn::make('PeriodID') // This will reference the period
                 ->label('Period')

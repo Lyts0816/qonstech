@@ -99,7 +99,8 @@ class DeductionResource extends Resource
     return $table
         ->columns([
             TextColumn::make('employee.full_name')
-                ->label('Employee'),
+                ->label('Employee')
+                ->searchable(['employees.first_name', 'employees.middle_name', 'employees.last_name']),
 
             TextColumn::make('DeductionType')
                 ->label('Deduction Type'),

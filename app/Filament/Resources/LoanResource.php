@@ -14,6 +14,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Illuminate\Support\Facades\Log;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Builder;
@@ -181,8 +182,9 @@ class LoanResource extends Resource
 
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('employee.full_name')
-                    ->label('Employee'),
+                TextColumn::make('employee.full_name')
+                ->label('Employee')
+                ->searchable(['employees.first_name', 'employees.middle_name', 'employees.last_name']),
 
                 Tables\Columns\TextColumn::make('employee.employment_type') // Assuming there's an employment_type field
                     ->label('Employment Type'),

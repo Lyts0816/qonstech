@@ -212,6 +212,12 @@ class EmployeesRelationManager extends RelationManager
                                     'status' => 'Available',
                                 ]);
                             }
+
+                            Notification::make()
+                            ->title('Success')
+                            ->body('Employees/Employee have been remove to the project project.')
+                            ->success()
+                            ->send();
                         })
                         ->deselectRecordsAfterCompletion()
                         ->requiresConfirmation(),

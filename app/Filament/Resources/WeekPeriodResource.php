@@ -19,8 +19,8 @@ class WeekPeriodResource extends Resource
     protected static ?string $model = WeekPeriod::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-calendar';
-    protected static ?string $navigationLabel = 'Periods';
-    protected static ?string $pluralLabel = 'Periods';
+    protected static ?string $navigationLabel = 'Payroll Period';
+    protected static ?string $pluralLabel = 'Payroll Periods';
 
     public static function form(Form $form): Form
     {
@@ -157,10 +157,11 @@ class WeekPeriodResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('StartDate')->label('Start Date')->date('m, d, Y')->sortable(),
-                Tables\Columns\TextColumn::make('EndDate')->label('End Date')->date('m, d, Y')->sortable(),
+                Tables\Columns\TextColumn::make('StartDate')->label('Start Date')->date('m, d, Y')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('EndDate')->label('End Date')->date('m, d, Y')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('Month')
                 ->sortable()
+
                 ->formatStateUsing(function ($state) {
                     $months = [
                         1 => 'January',
@@ -185,7 +186,18 @@ class WeekPeriodResource extends Resource
             ->filters([
                 Filter::make('StartDate')
                 ->label('Start Date'),
+            ])
+            ->actions([
+                Tables\Actions\DeleteAction::make()->label('Deactivate')
+                ->modalSubmitActionLabel('Deactivate')
+                ->modalHeading('Deactivate Payroll Period')
+                ->hidden(fn($record) => $record->trashed())
+                ->successNotificationTitle('Payroll Period Deactivated'),
+
+                Tables\Actions\ForceDeleteAction::make(),
+                Tables\Actions\RestoreAction::make(),
             ]);
+            
     }
 
     public static function getRelations(): array
@@ -194,6 +206,14 @@ class WeekPeriodResource extends Resource
             // Define any relationships here if needed
         ];
     }
+
+    public static function getEloquentQuery(): Builder
+	{
+		return parent::getEloquentQuery()
+			->withoutGlobalScopes([
+				SoftDeletingScope::class,
+			]);
+	}
 
     public static function getPages(): array
     {

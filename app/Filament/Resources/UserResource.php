@@ -149,7 +149,7 @@ class UserResource extends Resource
                 TextColumn::make('email')
                     ->searchable(),
                 TextColumn::make('role')
-                    ->searchable(), // Allow searching by role name
+                    ->searchable(), 
                     
             ])
 

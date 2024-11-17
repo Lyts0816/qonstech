@@ -85,7 +85,7 @@ class OvertimeScheduleResource extends Resource
     
     protected function afterSave(Model $record, array $data): void
     {
-        dd($data['Status']);
+        // dd($data['Status']);
         // Only process if the status is approved
         if ($data['Status'] === 'approved') {
             // Check for existing attendance record
@@ -117,7 +117,10 @@ class OvertimeScheduleResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('employee.full_name')
-                ->label('Employee'),
+                ->label('Employee')
+                ->searchable(['employees.first_name', 'employees.middle_name', 'employees.last_name']),
+            
+
 
                 TextColumn::make('Reason')
                     ->label('Reason'),
