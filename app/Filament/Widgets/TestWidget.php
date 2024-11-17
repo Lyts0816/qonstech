@@ -9,10 +9,19 @@ use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\Section;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
+use Illuminate\Support\Facades\Auth;
+use App\Models\User;
+
 class TestWidget extends BaseWidget
 {
 
     protected static ?int $sort = 3;
+
+    public static function canView(): bool
+    {
+    return  Auth::user()->role === User::ROLE_PROJECTCLERK || Auth::user()->role === User::ROLE_ADMIN;
+    }
+
     protected function getStats(): array
     {
         return [

@@ -5,10 +5,18 @@ namespace App\Filament\Widgets;
 use App\Models\Project;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
 class ProjectWidget extends BaseWidget
 {
     protected static ?int $sort = 2;
+
+    public static function canView(): bool
+    {
+    return  Auth::user()->role === User::ROLE_PROJECTCLERK || Auth::user()->role === User::ROLE_ADMIN;
+    }
+
     protected function getStats(): array
     {
         return [
