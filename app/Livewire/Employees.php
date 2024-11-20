@@ -35,7 +35,6 @@ class Employees extends BaseWidget
                     ->searchable(['first_name', 'middle_name', 'last_name']),
 
                 Tables\Columns\TextColumn::make('position.PositionName'),
-
                 TextColumn::make('province')
                     ->label('Province')
                     ->searchable()
