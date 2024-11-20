@@ -15,8 +15,7 @@ class EmployeePieWidget extends ChartWidget
 
     public static function canView(): bool
     {
-    return  Auth::user()->role === User::ROLE_ADMIN || Auth::user()->role === User::ROLE_ADMINUSER || Auth::user()->role === User::ROLE_FIVP || Auth::user()->role === User::ROLE_PROJECTCLERK;
-    // return false;
+        return  Auth::user()->role === User::ROLE_ADMIN || Auth::user()->role === User::ROLE_ADMINUSER || Auth::user()->role === User::ROLE_FIVP || Auth::user()->role === User::ROLE_PROJECTCLERK;
     }
 
     protected function getData(): array

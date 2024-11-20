@@ -8,10 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Overtime extends Model
 {
     use HasFactory;
-
-    
     protected $table = 'overtime';
-
     protected $fillable = [
         'Reason',
         'EmployeeID',
@@ -26,5 +23,4 @@ class Overtime extends Model
     {
         return $this->hasMany(Employee::class);
     }
-
 }

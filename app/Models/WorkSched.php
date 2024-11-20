@@ -17,10 +17,8 @@ class WorkSched extends Model
 
     protected $fillable = [
         'ScheduleName',
-
         'RegularHours',
         'ScheduleType',
-        
         'monday',
         'tuesday',
         'wednesday',
@@ -28,7 +26,6 @@ class WorkSched extends Model
         'friday',
         'saturday',
         'sunday',
-
         'CheckinOne',
         'CheckoutOne',
         'CheckinTwo',

@@ -14,8 +14,6 @@ class EditSss extends EditRecord
 
     protected function getHeaderActions(): array
     {
-        return [
-        
-        ];
+        return [];
     }
 }

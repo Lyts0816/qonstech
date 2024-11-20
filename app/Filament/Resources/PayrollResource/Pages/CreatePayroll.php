@@ -10,7 +10,7 @@ class CreatePayroll extends CreateRecord
 {
     protected static string $resource = PayrollResource::class;
 
-		
+
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index');

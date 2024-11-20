@@ -117,7 +117,7 @@ class ReportResource extends Resource
                         }
                     }),
 
-                Fieldset::make('Payroll Details')// Create a two-column grid layout for the first two fields
+                Fieldset::make('Payroll Details') // Create a two-column grid layout for the first two fields
                     ->schema([
 
                         Select::make('EmployeeStatus')
@@ -136,9 +136,7 @@ class ReportResource extends Resource
                                 } elseif ($state === 'Contractual') {
                                     $set('PayrollFrequency', 'Weekly');
                                 }
-                            }),
-
-                        // Assignment Select Field
+                            }), 
                         Select::make('assignment')
                             ->label('Assignment')
                             ->required(fn(string $context) => $context === 'create' || $context === 'edit')
@@ -153,9 +151,7 @@ class ReportResource extends Resource
                                 if ($state !== 'Project Based') {
                                     $set('ProjectID', null); // Reset the project selection
                                 }
-                            }),
-
-                        // Project Select Field - only shown if assignment is Project Based
+                            }), 
                         Select::make('ProjectID')
                             ->label('Project')
                             ->required(fn(string $context) => $context === 'create' || $context === 'edit')
@@ -271,18 +267,16 @@ class ReportResource extends Resource
                                             ->where('Year', $year)
                                             ->get()
                                             ->mapWithKeys(function ($period) {
-                                            return [
-                                                $period->id => $period->StartDate . ' - ' . $period->EndDate,
-                                            ];
-                                        });
+                                                return [
+                                                    $period->id => $period->StartDate . ' - ' . $period->EndDate,
+                                                ];
+                                            });
                                     } catch (\Exception $e) {
                                         // Log the exception or handle it as needed
                                         Log::error('Error fetching week periods: ' . $e->getMessage());
                                         return [];
                                     }
-                                }
-
-                                // If any of the fields are not set, return an empty array
+                                } 
                                 return [];
                             })
                             ->native(false)
@@ -324,15 +318,7 @@ class ReportResource extends Resource
                     ->Label('Payroll Month'),
 
                 Tables\Columns\TextColumn::make('PayrollYear')
-                    ->Label('Payroll Year'),
-
-                // Tables\Columns\TextColumn::make('PayrollFrequency')
-                //     ->Label('Payroll Frequency'),
-
-                // Tables\Columns\TextColumn::make('PayrollDate2')
-                //     ->label('Payroll Dates')
-                //     ->searchable()
-                //     ->sortable(),
+                    ->Label('Payroll Year'), 
             ])
             ->actions([
                 Tables\Actions\Action::make('viewSummary')
@@ -353,14 +339,14 @@ class ReportResource extends Resource
                                         ->where('employment_type', $EmployeeStatus)
                                         ->get()
                                         ->mapWithKeys(function ($employee) {
-                                        return [$employee->id => "{$employee->first_name} {$employee->last_name}"];
-                                    });
+                                            return [$employee->id => "{$employee->first_name} {$employee->last_name}"];
+                                        });
 
                                     // Add "All Employees in this Project" option
                                     return ['All' => 'All Employees'] + $employees->toArray();
                                 } else {
                                     $employees = \App\Models\Employee::where('employment_type', $EmployeeStatus)
-																				->whereNull('project_id')
+                                        ->whereNull('project_id')
                                         ->get()
                                         ->mapWithKeys(function ($employee) {
                                             return [$employee->id => "{$employee->first_name} {$employee->last_name}"];
@@ -395,21 +381,18 @@ class ReportResource extends Resource
                     ->openUrlInNewTab()
                     ->visible(fn($record) => $record->ReportType != 'Payslip'),
 
-                
-                    Tables\Actions\DeleteAction::make()->label('Archive')
+
+                Tables\Actions\DeleteAction::make()->label('Archive')
                     ->modalSubmitActionLabel('Archived')
                     ->modalHeading('Archived Report')
                     ->hidden(fn($record) => $record->trashed())
                     ->successNotificationTitle('Report Archived'),
 
-                    Tables\Actions\RestoreAction::make(),
+                Tables\Actions\RestoreAction::make(),
                 // Tables\Actions\EditAction::make(),
             ])
-            ->bulkActions([
-                    // Tables\Actions\BulkActionGroup::make([
-                    //     Tables\Actions\DeleteBulkAction::make(),
-                    // ]),
-                ]);
+            ->bulkActions([ 
+            ]);
     }
 
     public static function getRelations(): array
@@ -420,12 +403,12 @@ class ReportResource extends Resource
     }
 
     public static function getEloquentQuery(): Builder
-	{
-		return parent::getEloquentQuery()
-			->withoutGlobalScopes([
-				SoftDeletingScope::class,
-			]);
-	}
+    {
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                SoftDeletingScope::class,
+            ]);
+    }
 
     public static function getPages(): array
     {

@@ -24,16 +24,16 @@ class ListWorkScheds extends ListRecords
     {
         return [
             'activeEmployees' => Tab::make('Active Work Schedule')
-            ->badge(WorkSched::whereNull('deleted_at')->count()) 
-            ->modifyQueryUsing(function ($query) {
-                $query->whereNull('deleted_at'); 
-            }),
+                ->badge(WorkSched::whereNull('deleted_at')->count())
+                ->modifyQueryUsing(function ($query) {
+                    $query->whereNull('deleted_at');
+                }),
 
             'archive' => Tab::make('Deactivated Work Schedule')
-            ->badge(WorkSched::onlyTrashed()->count())
-            ->modifyQueryUsing(function ($query) {
-                $query->onlyTrashed();
-            }),
+                ->badge(WorkSched::onlyTrashed()->count())
+                ->modifyQueryUsing(function ($query) {
+                    $query->onlyTrashed();
+                }),
         ];
     }
 }

@@ -13,7 +13,7 @@ class CreatePagibig extends CreateRecord
     protected static ?string $title = 'Create Pagibig Contribution';
 
     protected function getRedirectUrl(): string
-{
-    return $this->getResource()::getUrl('index');
-}
+    {
+        return $this->getResource()::getUrl('index');
+    }
 }

@@ -23,16 +23,16 @@ class ListEarnings extends ListRecords
     {
         return [
             'activeEmployees' => Tab::make('Active Earnings')
-            ->badge(Earnings::whereNull('deleted_at')->count()) 
-            ->modifyQueryUsing(function ($query) {
-                $query->whereNull('deleted_at'); 
-            }),
+                ->badge(Earnings::whereNull('deleted_at')->count())
+                ->modifyQueryUsing(function ($query) {
+                    $query->whereNull('deleted_at');
+                }),
 
             'archive' => Tab::make('Deactivated Earnings')
-            ->badge(Earnings::onlyTrashed()->count())
-            ->modifyQueryUsing(function ($query) {
-                $query->onlyTrashed();
-            }),
+                ->badge(Earnings::onlyTrashed()->count())
+                ->modifyQueryUsing(function ($query) {
+                    $query->onlyTrashed();
+                }),
         ];
     }
 }

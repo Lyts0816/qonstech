@@ -24,16 +24,16 @@ class ListPositions extends ListRecords
     {
         return [
             'activeEmployees' => Tab::make('Active Position')
-            ->badge(Position::whereNull('deleted_at')->count()) 
-            ->modifyQueryUsing(function ($query) {
-                $query->whereNull('deleted_at'); 
-            }),
+                ->badge(Position::whereNull('deleted_at')->count())
+                ->modifyQueryUsing(function ($query) {
+                    $query->whereNull('deleted_at');
+                }),
 
             'archive' => Tab::make('Deactivated Position')
-            ->badge(Position::onlyTrashed()->count())
-            ->modifyQueryUsing(function ($query) {
-                $query->onlyTrashed();
-            }),
+                ->badge(Position::onlyTrashed()->count())
+                ->modifyQueryUsing(function ($query) {
+                    $query->onlyTrashed();
+                }),
         ];
     }
 }

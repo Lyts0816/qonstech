@@ -15,8 +15,7 @@ class PayrollPieWidget extends ChartWidget
 
     public static function canView(): bool
     {
-    return  Auth::user()->role === User::ROLE_ADMIN || Auth::user()->role === User::ROLE_ADMINUSER || Auth::user()->role === User::ROLE_FIVP;
-    // return false;
+        return  Auth::user()->role === User::ROLE_ADMIN || Auth::user()->role === User::ROLE_ADMINUSER || Auth::user()->role === User::ROLE_FIVP;
     }
 
     protected function getData(): array

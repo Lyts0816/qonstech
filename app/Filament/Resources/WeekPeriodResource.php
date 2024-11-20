@@ -27,38 +27,38 @@ class WeekPeriodResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Select::make('Month')
-                ->options([
-                    1 => 'January',
-                    2 => 'February',
-                    3 => 'March',
-                    4 => 'April',
-                    5 => 'May',
-                    6 => 'June',
-                    7 => 'July',
-                    8 => 'August',
-                    9 => 'September',
-                    10 => 'October',
-                    11 => 'November',
-                    12 => 'December'
-                ])
-                ->required(fn (string $context) => $context === 'create')
-                ->label('Month')
-                ->default(date('n'))
-                ->options(fn () => collect([
-                    1 => 'January',
-                    2 => 'February',
-                    3 => 'March',
-                    4 => 'April',
-                    5 => 'May',
-                    6 => 'June',
-                    7 => 'July',
-                    8 => 'August',
-                    9 => 'September',
-                    10 => 'October',
-                    11 => 'November',
-                    12 => 'December'
-                ])->filter(fn ($label, $key) => $key >= date('n'))),
-                    
+                    ->options([
+                        1 => 'January',
+                        2 => 'February',
+                        3 => 'March',
+                        4 => 'April',
+                        5 => 'May',
+                        6 => 'June',
+                        7 => 'July',
+                        8 => 'August',
+                        9 => 'September',
+                        10 => 'October',
+                        11 => 'November',
+                        12 => 'December'
+                    ])
+                    ->required(fn(string $context) => $context === 'create')
+                    ->label('Month')
+                    ->default(date('n'))
+                    ->options(fn() => collect([
+                        1 => 'January',
+                        2 => 'February',
+                        3 => 'March',
+                        4 => 'April',
+                        5 => 'May',
+                        6 => 'June',
+                        7 => 'July',
+                        8 => 'August',
+                        9 => 'September',
+                        10 => 'October',
+                        11 => 'November',
+                        12 => 'December'
+                    ])->filter(fn($label, $key) => $key >= date('n'))),
+
 
                 Forms\Components\TextInput::make('Year')
                     ->required()
@@ -75,10 +75,9 @@ class WeekPeriodResource extends Resource
                     ->required()
                     ->reactive()
                     ->label('Category'),
-                    
+
                 Forms\Components\Select::make('Type')
                     ->options(function (callable $get) {
-                        // Dynamically update the options based on the selected Category
                         if ($get('Category') === 'Weekly') {
                             return [
                                 'Week 1' => 'Week 1',
@@ -100,13 +99,10 @@ class WeekPeriodResource extends Resource
                     ->afterStateUpdated(function ($state, callable $get, callable $set) {
                         $month = $get('Month');
                         $year = $get('Year');
-    
-                        // Ensure Month and Year are valid before calculating dates
                         if (!empty($month) && !empty($year)) {
                             $month = str_pad($month, 2, '0', STR_PAD_LEFT);
 
                             if ($get('Category') === 'Weekly') {
-                                // Set StartDate and EndDate based on selected week
                                 switch ($state) {
                                     case 'Week 1':
                                         $set('StartDate', "$year-$month-01");
@@ -129,7 +125,6 @@ class WeekPeriodResource extends Resource
                                         $set('EndDate', null);
                                 }
                             } elseif ($get('Category') === 'Kinsenas') {
-                                // Set StartDate and EndDate for Kinsenas
                                 if ($state === '1st Kinsena') {
                                     $set('StartDate', "$year-$month-01");
                                     $set('EndDate', "$year-$month-15");
@@ -149,9 +144,6 @@ class WeekPeriodResource extends Resource
                     ->label('End Date'),
             ]);
     }
-    
-    
-    
 
     public static function table(Table $table): Table
     {
@@ -160,44 +152,43 @@ class WeekPeriodResource extends Resource
                 Tables\Columns\TextColumn::make('StartDate')->label('Start Date')->date('m, d, Y')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('EndDate')->label('End Date')->date('m, d, Y')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('Month')
-                ->sortable()
+                    ->sortable()
 
-                ->formatStateUsing(function ($state) {
-                    $months = [
-                        1 => 'January',
-                        2 => 'February',
-                        3 => 'March',
-                        4 => 'April',
-                        5 => 'May',
-                        6 => 'June',
-                        7 => 'July',
-                        8 => 'August',
-                        9 => 'September',
-                        10 => 'October',
-                        11 => 'November',
-                        12 => 'December'
-                    ];
-                    return $months[$state] ?? $state;
-                }),
+                    ->formatStateUsing(function ($state) {
+                        $months = [
+                            1 => 'January',
+                            2 => 'February',
+                            3 => 'March',
+                            4 => 'April',
+                            5 => 'May',
+                            6 => 'June',
+                            7 => 'July',
+                            8 => 'August',
+                            9 => 'September',
+                            10 => 'October',
+                            11 => 'November',
+                            12 => 'December'
+                        ];
+                        return $months[$state] ?? $state;
+                    }),
                 Tables\Columns\TextColumn::make('Year')->sortable(),
                 Tables\Columns\TextColumn::make('Category'),
                 Tables\Columns\TextColumn::make('Type'),
             ])
             ->filters([
                 Filter::make('StartDate')
-                ->label('Start Date'),
+                    ->label('Start Date'),
             ])
             ->actions([
                 Tables\Actions\DeleteAction::make()->label('Deactivate')
-                ->modalSubmitActionLabel('Deactivate')
-                ->modalHeading('Deactivate Payroll Period')
-                ->hidden(fn($record) => $record->trashed())
-                ->successNotificationTitle('Payroll Period Deactivated'),
+                    ->modalSubmitActionLabel('Deactivate')
+                    ->modalHeading('Deactivate Payroll Period')
+                    ->hidden(fn($record) => $record->trashed())
+                    ->successNotificationTitle('Payroll Period Deactivated'),
 
                 Tables\Actions\ForceDeleteAction::make(),
                 Tables\Actions\RestoreAction::make(),
             ]);
-            
     }
 
     public static function getRelations(): array
@@ -208,12 +199,12 @@ class WeekPeriodResource extends Resource
     }
 
     public static function getEloquentQuery(): Builder
-	{
-		return parent::getEloquentQuery()
-			->withoutGlobalScopes([
-				SoftDeletingScope::class,
-			]);
-	}
+    {
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                SoftDeletingScope::class,
+            ]);
+    }
 
     public static function getPages(): array
     {

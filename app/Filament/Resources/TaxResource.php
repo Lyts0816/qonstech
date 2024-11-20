@@ -40,14 +40,14 @@ class TaxResource extends Resource
                     ->numeric()
                     ->required()
                     ->placeholder('Enter minimum salary for this bracket'),
-    
+
                 // Maximum Salary
                 TextInput::make('MaxSalary')
                     ->label('Maximum Salary')
                     ->numeric()
                     ->required()
                     ->placeholder('Enter maximum salary for this bracket'),
-    
+
                 // Contribution Amount
                 TextInput::make('compensation')
                     ->label('Compensation')
@@ -58,9 +58,9 @@ class TaxResource extends Resource
                 TextInput::make('wth_tax')
                     ->label('wth_tax')
                     ->numeric()
-                    ->required(fn (string $context) => $context === 'create')
+                    ->required(fn(string $context) => $context === 'create')
                     ->placeholder('Enter base rate amount for this bracket'),
-    
+
                 // Contribution Rate
                 TextInput::make('excess_percent')
                     ->label('Percentage')
@@ -74,15 +74,15 @@ class TaxResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('id')
-                ->label('TAX ID')
-                ->searchable(),
+                    ->label('TAX ID')
+                    ->searchable(),
 
                 TextColumn::make('MinSalary')
-                ->searchable(),
+                    ->searchable(),
 
                 TextColumn::make('MaxSalary')
-                ->searchable(),
-                
+                    ->searchable(),
+
                 TextColumn::make('compensation'),
                 TextColumn::make('wth_tax'),
                 TextColumn::make('excess_percent'),
@@ -93,8 +93,7 @@ class TaxResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
             ])
-            ->bulkActions([
-            ]);
+            ->bulkActions([]);
     }
 
 

@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
@@ -15,50 +14,51 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
 {
     use SoftDeletes;
     use Notifiable;
-    
+
     const ROLE_ADMIN = 'Human Resource';
-
     const ROLE_PROJECTCLERK = 'Project Clerk';
-
     const ROLE_ADMINUSER = 'Admin Vice President';
-
     const ROLE_FIVP = 'Finance Vice President';
-    
-    
 
     const ROLES = [
         self::ROLE_ADMIN => 'Human Resource',
-        
+
         self::ROLE_PROJECTCLERK => 'Project Clerk',
     ];
 
-
-    public function isVPFI(){
+    public function isVPFI()
+    {
         return $this->role === self::ROLE_ADMINUSER || $this->role === self::ROLE_FIVP;
-    } 
+    }
 
-    public function isCLerk(){
+    public function isCLerk()
+    {
         return $this->role === self::ROLE_PROJECTCLERK;
-    } 
+    }
 
-    public function isHR(){
+    public function isHR()
+    {
         return $this->role === self::ROLE_ADMIN;
-    } 
-    
+    }
 
-    public function canAccessPanel(Panel $panel): bool{
+
+    public function canAccessPanel(Panel $panel): bool
+    {
         return true;
     }
 
-    public function isAdmin(){
+    public function isAdmin()
+    {
         return $this->role === self::ROLE_ADMINUSER || $this->role === self::ROLE_ADMIN;
     }
 
-    public function isAdVP(){
+    public function isAdVP()
+    {
         return $this->role === self::ROLE_ADMINUSER;
     }
 
-    public function isFiVp(){
+    public function isFiVp()
+    {
         return $this->role === self::ROLE_FIVP;
     }
 
@@ -92,7 +92,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
     {
         return $this->belongsTo(Employee::class, 'EmployeeID');
     }
-     
+
     /**
      * Get the attributes that should be cast.
      *
@@ -105,7 +105,6 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
             'password' => 'hashed',
         ];
     }
-
 
     public function roles()
     {

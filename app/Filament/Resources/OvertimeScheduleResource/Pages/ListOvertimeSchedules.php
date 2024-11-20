@@ -23,16 +23,16 @@ class ListOvertimeSchedules extends ListRecords
     {
         return [
             'activeEmployees' => Tab::make('Active Overtime')
-            ->badge(OvertimeSchedule::whereNull('deleted_at')->count()) 
-            ->modifyQueryUsing(function ($query) {
-                $query->whereNull('deleted_at'); 
-            }),
+                ->badge(OvertimeSchedule::whereNull('deleted_at')->count())
+                ->modifyQueryUsing(function ($query) {
+                    $query->whereNull('deleted_at');
+                }),
 
             'archive' => Tab::make('Deactivated Overtime')
-            ->badge(OvertimeSchedule::onlyTrashed()->count())
-            ->modifyQueryUsing(function ($query) {
-                $query->onlyTrashed();
-            }),
+                ->badge(OvertimeSchedule::onlyTrashed()->count())
+                ->modifyQueryUsing(function ($query) {
+                    $query->onlyTrashed();
+                }),
         ];
     }
 }

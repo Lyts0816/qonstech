@@ -22,10 +22,8 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class HolidayResource extends Resource
 {
 	protected static ?string $model = Holiday::class;
-
 	protected static ?string $navigationIcon = 'heroicon-o-calendar-date-range';
 	protected static ?string $navigationGroup = "Employee Payroll";
-
 	public static function form(Form $form): Form
 	{
 		return $form
@@ -33,31 +31,29 @@ class HolidayResource extends Resource
 				Section::make('Holiday')
 					->schema([
 						TextInput::make('HolidayName')
-                            ->label('Holiday Name')
-                            ->required(fn(string $context) => $context === 'create' || $context === 'edit')
-                            ->unique(ignoreRecord: true)
-                            ->rules([
-                                'regex:/^[a-zA-Z\s]*$/', // Ensures no digits and no special characters are present
-                                'min:3',                 // Ensures the holiday name is at least 3 characters long
-                                'max:30'                 // Ensures the holiday name is no more than 50 characters long
-                            ])
-                            ->validationMessages([
-                                'regex' => 'The holiday name must not contain any digits or special characters.',
-                                'min' => 'The holiday name must be at least 3 characters long.',
-                                'max' => 'The holiday name must not exceed 30 characters.'
-                            ]),
-
-                        DatePicker::make('HolidayDate')
-                            ->label('Holiday Date')
-                            ->required(fn(string $context) => $context === 'create' || $context === 'edit')
-                            ->rules([
-                                'date', // Ensures the value is a valid date
-                            ])
-                            ->validationMessages([
-                                'required' => 'The holiday date is required.',
-                                'date' => 'The holiday date must be a valid date.',
-                            ]),
-
+							->label('Holiday Name')
+							->required(fn(string $context) => $context === 'create' || $context === 'edit')
+							->unique(ignoreRecord: true)
+							->rules([
+								'regex:/^[a-zA-Z\s]*$/',
+								'min:3',
+								'max:30'
+							])
+							->validationMessages([
+								'regex' => 'The holiday name must not contain any digits or special characters.',
+								'min' => 'The holiday name must be at least 3 characters long.',
+								'max' => 'The holiday name must not exceed 30 characters.'
+							]),
+						DatePicker::make('HolidayDate')
+							->label('Holiday Date')
+							->required(fn(string $context) => $context === 'create' || $context === 'edit')
+							->rules([
+								'date',
+							])
+							->validationMessages([
+								'required' => 'The holiday date is required.',
+								'date' => 'The holiday date must be a valid date.',
+							]),
 						Select::make('HolidayType')
 							->label('Holiday Type')
 							->required(fn(string $context) => $context === 'create' || $context === 'edit')
@@ -66,7 +62,7 @@ class HolidayResource extends Resource
 								'Special' => 'Special (130%)',
 							])->native(false),
 
-						
+
 					])->columns(3)->collapsible(true),
 			]);
 	}
@@ -78,18 +74,15 @@ class HolidayResource extends Resource
 				TextColumn::make('HolidayName')
 					->label('Holiday Name')
 					->searchable(['HolidayName']),
-
 				TextColumn::make('HolidayDate')
 					->label('Holiday Date'),
-
 				TextColumn::make('HolidayType')
 					->label('Holiday Type'),
-
 				TextColumn::make('HolidayType')
 					->label('Holiday Type'),
 
 			])
-			
+
 			->filters([
 				SelectFilter::make('HolidayType')
 					->label('Filter by Holiday Type')
@@ -104,29 +97,23 @@ class HolidayResource extends Resource
 			])
 			->actions([
 				Tables\Actions\EditAction::make()
-                ->hidden(fn($record) => $record->trashed()),
+					->hidden(fn($record) => $record->trashed()),
 
-                Tables\Actions\DeleteAction::make()->label('Deactivate')
-                ->modalSubmitActionLabel('Deactivate')
-                ->modalHeading('Deactivate Holiday')
-                ->hidden(fn($record) => $record->trashed())
-                ->successNotificationTitle('Holiday Deactivated'),
+				Tables\Actions\DeleteAction::make()->label('Deactivate')
+					->modalSubmitActionLabel('Deactivate')
+					->modalHeading('Deactivate Holiday')
+					->hidden(fn($record) => $record->trashed())
+					->successNotificationTitle('Holiday Deactivated'),
 
-                Tables\Actions\ForceDeleteAction::make(),
-                Tables\Actions\RestoreAction::make(),
+				Tables\Actions\ForceDeleteAction::make(),
+				Tables\Actions\RestoreAction::make(),
 			])
-			->bulkActions([
-				// Tables\Actions\BulkActionGroup::make([
-				// 	Tables\Actions\DeleteBulkAction::make(),
-				// ]),
-			]);
+			->bulkActions([]);
 	}
 
 	public static function getRelations(): array
 	{
-		return [
-			//
-		];
+		return [];
 	}
 
 	public static function getEloquentQuery(): Builder

@@ -9,11 +9,9 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateWorkSched extends CreateRecord
 {
     protected static ?string $title = 'Create Work Schedules';
-
     protected static string $resource = WorkSchedResource::class;
-
     protected function getRedirectUrl(): string
-{
-    return $this->getResource()::getUrl('index');
-}
+    {
+        return $this->getResource()::getUrl('index');
+    }
 }

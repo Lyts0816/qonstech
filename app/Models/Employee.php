@@ -30,8 +30,6 @@ class Employee extends Model
         'province',
         'contact_number',
         'status',
-        // 'attendance_code',
-
         'SSSNumber',
         'PhilHealthNumber',
         'PagibigNumber',
@@ -58,7 +56,7 @@ class Employee extends Model
      */
     public function project()
     {
-        return $this->belongsTo(Project::class );
+        return $this->belongsTo(Project::class);
     }
 
     /**
@@ -84,19 +82,14 @@ class Employee extends Model
         return "{$this->first_name} {$this->middle_name} {$this->last_name}";
     }
 
-
-
-
     public function attendanceRecords()
     {
         return $this->hasMany(Attendance::class, 'employee_id');
     }
 
-
-
     public function province()
     {
-        return $this->belongsTo(Province::class, 'PR_Province', 'provDesc'); // Maps the name directly
+        return $this->belongsTo(Province::class, 'PR_Province', 'provDesc');
     }
 
     public function city()
@@ -109,18 +102,13 @@ class Employee extends Model
         return $this->belongsTo(Barangay::class, 'PR_Barangay', 'brgyDesc');
     }
 
-public function getFullAddressAttribute()
-{
-    $streetName = $this->street ?? '';
-    $barangayName = $this->barangay ? $this->barangay->brgyDesc : '';
-    $cityName = $this->city ? $this->city->citymunDesc : '';
-    $provinceName = $this->province ? $this->province->provDesc : '';
+    public function getFullAddressAttribute()
+    {
+        $streetName = $this->street ?? '';
+        $barangayName = $this->barangay ? $this->barangay->brgyDesc : '';
+        $cityName = $this->city ? $this->city->citymunDesc : '';
+        $provinceName = $this->province ? $this->province->provDesc : '';
 
-    return trim("{$streetName} {$barangayName} {$cityName} {$provinceName}");
-}
-
-    
-    
-
-    
+        return trim("{$streetName} {$barangayName} {$cityName} {$provinceName}");
+    }
 }

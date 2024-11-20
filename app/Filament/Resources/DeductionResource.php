@@ -39,20 +39,16 @@ class DeductionResource extends Resource
     {
         return $form
             ->schema([
-                // Employee Select Field
                 Select::make('employeeID')
-                ->label('Employee')
-                ->options(Employee::all()->pluck('full_name', 'id'))
-                ->required()
-                ->preload()
-                ->searchable()
-                ->reactive() // Make this field reactive
-                ->afterStateUpdated(function ($state, $set) {
-                    // Clear PeriodID when EmployeeID changes
-                    $set('PeriodID', null);
-                }),
-            
-                // Deduction Type - Leave only Salary Adjustment
+                    ->label('Employee')
+                    ->options(Employee::all()->pluck('full_name', 'id'))
+                    ->required()
+                    ->preload()
+                    ->searchable()
+                    ->reactive()
+                    ->afterStateUpdated(function ($state, $set) {
+                        $set('PeriodID', null);
+                    }),
                 Select::make('DeductionType')
                     ->label('Deduction Type')
                     ->options([
@@ -60,22 +56,18 @@ class DeductionResource extends Resource
                         'SalaryAdjustment' => 'Salary Adjustment',
                     ])
                     ->default('SalaryAdjustment'),
-                                         
-                // Amount Field
                 TextInput::make('Amount')
                     ->label('Amount')
                     ->required()
                     ->numeric(),
 
-                    Select::make('PeriodID')
+                Select::make('PeriodID')
                     ->label('Select Period')
                     ->options(function (callable $get) {
-                        // Ensure PeriodID is reactive to EmployeeID
                         $employeeId = $get('employeeID');
                         if ($employeeId) {
                             $employee = Employee::find($employeeId);
                             if ($employee) {
-                                // Dynamically filter WeekPeriod based on employee status
                                 $category = $employee->employment_type === 'Regular' ? 'Kinsenas' : 'Weekly';
                                 return WeekPeriod::where('Category', operator: $category)->get()
                                     ->mapWithKeys(function ($period) {
@@ -87,60 +79,53 @@ class DeductionResource extends Resource
                         }
                         return [];
                     })
-                    ->reactive() // Add reactivity here
-                    ->required(fn (string $context) => $context === 'create'),
+                    ->reactive()
+                    ->required(fn(string $context) => $context === 'create'),
             ]);
     }
-    
-
 
     public static function table(Table $table): Table
-{
-    return $table
-        ->columns([
-            TextColumn::make('employee.full_name')
-                ->label('Employee')
-                ->searchable(['employees.first_name', 'employees.middle_name', 'employees.last_name']),
+    {
+        return $table
+            ->columns([
+                TextColumn::make('employee.full_name')
+                    ->label('Employee')
+                    ->searchable(['employees.first_name', 'employees.middle_name', 'employees.last_name']),
 
-            TextColumn::make('DeductionType')
-                ->label('Deduction Type'),
+                TextColumn::make('DeductionType')
+                    ->label('Deduction Type'),
 
-            TextColumn::make('PeriodID') // Reference to the period
-                ->label('Period')
-                ->formatStateUsing(function ($state, $record) {
-                    // Assuming $record->weekperiod exists and contains StartDate and EndDate
-                    return $record->weekperiod ? 
-                        $record->weekperiod->StartDate . ' - ' . $record->weekperiod->EndDate : 
-                        'N/A'; // Handle case where no period is found
-                }),
+                TextColumn::make('PeriodID')
+                    ->label('Period')
+                    ->formatStateUsing(function ($state, $record) {
+                        return $record->weekperiod ?
+                            $record->weekperiod->StartDate . ' - ' . $record->weekperiod->EndDate :
+                            'N/A';
+                    }),
 
-            TextColumn::make('Amount')
-                ->label('Amount'),
-        ])
-        ->filters([
-            // Add filters here if needed
-        ])
-        ->actions([
-            Tables\Actions\EditAction::make()
-                ->hidden(fn($record) => $record->trashed()),
+                TextColumn::make('Amount')
+                    ->label('Amount'),
+            ])
+            ->filters([])
+            ->actions([
+                Tables\Actions\EditAction::make()
+                    ->hidden(fn($record) => $record->trashed()),
 
                 Tables\Actions\DeleteAction::make()->label('Deactivate')
-                ->modalSubmitActionLabel('Deactivate')
-                ->modalHeading('Deactivate Deduction')
-                ->hidden(fn($record) => $record->trashed())
-                ->successNotificationTitle('Deduction Deactivated'),
+                    ->modalSubmitActionLabel('Deactivate')
+                    ->modalHeading('Deactivate Deduction')
+                    ->hidden(fn($record) => $record->trashed())
+                    ->successNotificationTitle('Deduction Deactivated'),
 
                 Tables\Actions\ForceDeleteAction::make(),
                 Tables\Actions\RestoreAction::make(),
-        ])
-        ->bulkActions([
-            Tables\Actions\BulkActionGroup::make([
-                Tables\Actions\DeleteBulkAction::make(),
-            ]),
-        ]);
-}
-
-
+            ])
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                ]),
+            ]);
+    }
     public static function getRelations(): array
     {
         return [
@@ -149,12 +134,12 @@ class DeductionResource extends Resource
     }
 
     public static function getEloquentQuery(): Builder
-	{
-		return parent::getEloquentQuery()
-			->withoutGlobalScopes([
-				SoftDeletingScope::class,
-			]);
-	}
+    {
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                SoftDeletingScope::class,
+            ]);
+    }
 
     public static function getPages(): array
     {

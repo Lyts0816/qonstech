@@ -15,5 +15,4 @@ class CreateProject extends CreateRecord
     {
         return $this->getResource()::getUrl('index');
     }
-
 }

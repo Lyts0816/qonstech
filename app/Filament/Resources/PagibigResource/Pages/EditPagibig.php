@@ -14,8 +14,6 @@ class EditPagibig extends EditRecord
 
     protected function getHeaderActions(): array
     {
-        return [
-        
-        ];
+        return [];
     }
 }

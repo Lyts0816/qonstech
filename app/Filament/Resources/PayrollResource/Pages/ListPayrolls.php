@@ -24,16 +24,16 @@ class ListPayrolls extends ListRecords
     {
         return [
             'activeEmployees' => Tab::make('Payrolls')
-            ->badge(Payroll::whereNull('deleted_at')->count()) 
-            ->modifyQueryUsing(function ($query) {
-                $query->whereNull('deleted_at'); 
-            }),
+                ->badge(Payroll::whereNull('deleted_at')->count())
+                ->modifyQueryUsing(function ($query) {
+                    $query->whereNull('deleted_at');
+                }),
 
             'archive' => Tab::make('Archived Payrolls')
-            ->badge(Payroll::onlyTrashed()->count())
-            ->modifyQueryUsing(function ($query) {
-                $query->onlyTrashed();
-            }),
+                ->badge(Payroll::onlyTrashed()->count())
+                ->modifyQueryUsing(function ($query) {
+                    $query->onlyTrashed();
+                }),
         ];
     }
 }

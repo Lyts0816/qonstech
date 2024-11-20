@@ -24,17 +24,17 @@ class ListUsers extends ListRecords
         $tabs = [];
 
         $tabs['activeEmployees'] = Tab::make('Active Users')
-        ->badge(User::whereNull('deleted_at')->count()) 
-        ->modifyQueryUsing(function ($query) {
-            $query->whereNull('deleted_at'); 
-        });
+            ->badge(User::whereNull('deleted_at')->count())
+            ->modifyQueryUsing(function ($query) {
+                $query->whereNull('deleted_at');
+            });
 
         $tabs['archived'] = Tab::make('Deactivated Users')
             ->badge(User::onlyTrashed()->count())
             ->modifyQueryUsing(function ($query) {
                 $query->onlyTrashed();
             });
-        
+
 
         return $tabs;
     }

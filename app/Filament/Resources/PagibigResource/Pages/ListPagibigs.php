@@ -16,8 +16,7 @@ class ListPagibigs extends ListRecords
     {
         return [
             Actions\CreateAction::make()
-            ->label('New Pagibig Contribution')
-            ,
+                ->label('New Pagibig Contribution'),
         ];
     }
 }

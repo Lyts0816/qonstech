@@ -98,8 +98,8 @@
 
 <body>
     <?php
-$imageData = base64_encode(file_get_contents(public_path('images/qonstech.png')));
-$src = 'data:image/png;base64,' . $imageData;
+    $imageData = base64_encode(file_get_contents(public_path('images/qonstech.png')));
+    $src = 'data:image/png;base64,' . $imageData;
     ?>
 
     <div>
@@ -119,13 +119,13 @@ $src = 'data:image/png;base64,' . $imageData;
                         <td>{{ $employee['first_name'] . ' ' . ($employee['middle_name'] ?? '') . ' ' . ($employee['last_name'] ?? '') }}
                         </td>
                         <th>Employment Status</th>
-                        <td>{{$employee['EmployeeStatus']}}</td>
+                        <td>{{ $employee['EmployeeStatus'] }}</td>
                     </tr>
                     <tr>
                         <th>Position</th>
                         <td>{{ $employee['position'] ?? '' }}</td>
                         <th>Payroll Period</th>
-                        <td>{{$employee['Period']}}</td>
+                        <td>{{ $employee['Period'] }}</td>
                     </tr>
                     <tr>
                         <th>Monthly Salary</th>
@@ -192,7 +192,7 @@ $src = 'data:image/png;base64,' . $imageData;
                     <tbody>
                         <tr>
                             <td>Tardiness</td>
-                            <td>PHP&nbsp;{{ number_format( $employee['TotalTardinessDed'] ?? 0, 2) }}
+                            <td>PHP&nbsp;{{ number_format($employee['TotalTardinessDed'] ?? 0, 2) }}
                             </td>
                         </tr>
                         <tr>

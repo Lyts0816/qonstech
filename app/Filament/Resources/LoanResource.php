@@ -57,7 +57,7 @@ class LoanResource extends Resource
                                 $set('MonthlyDeduction', null);
                                 $set('Balance', null);  // Reset Balance as well
                             }),
-    
+
                         Select::make('PeriodID')
                             ->label('Select Starting Period')
                             ->options(function (callable $get) {
@@ -78,7 +78,7 @@ class LoanResource extends Resource
                             })
                             ->required()
                             ->reactive(),
-    
+
                         Select::make('LoanType')
                             ->label('Loan Type')
                             ->options([
@@ -87,7 +87,7 @@ class LoanResource extends Resource
                                 'Pagibig Loan' => 'Pagibig Loan',
                             ])
                             ->required(),
-    
+
                         TextInput::make('LoanAmount')
                             ->label('Total Amount Due')
                             ->required()
@@ -102,11 +102,11 @@ class LoanResource extends Resource
                                     $set('KinsenaDeduction', self::calculateKinsenaDeduction($loanAmount, $numberOfPayments));
                                     $set('MonthlyDeduction', self::calculateMonthlyDeduction($loanAmount, $numberOfPayments));
                                 }
-    
+
                                 // Set Balance as the same as LoanAmount initially
                                 $set('Balance', $loanAmount);
                             }),
-    
+
                         TextInput::make('NumberOfPayments')
                             ->label('Number of Monthly Payments')
                             ->required()
@@ -121,7 +121,7 @@ class LoanResource extends Resource
                                     $set('MonthlyDeduction', self::calculateMonthlyDeduction($loanAmount, $numberOfPayments));
                                 }
                             }),
-    
+
                         TextInput::make('MonthlyDeduction')
                             ->numeric()
                             ->rules([
@@ -133,7 +133,7 @@ class LoanResource extends Resource
                                 'min' => 'The monthly deduction must be at least 0.',
                                 'max' => 'The monthly deduction must not exceed 150,000.',
                             ]),
-    
+
                         TextInput::make('KinsenaDeduction')
                             ->numeric()
                             ->rules([
@@ -141,19 +141,19 @@ class LoanResource extends Resource
                                 'max:150000',                // Ensures the deduction does not exceed 150,000
                             ])
                             ->dehydrated(true),
-    
+
                         // New field for Balance
                         TextInput::make('Balance')
-                        ->label('Balance')
-                        ->numeric()
-                        ->required()
-                        ->disabled()  // Prevents user editing
-                        ->dehydrated(true)  // Ensures the value is saved
-                        ->reactive(),
+                            ->label('Balance')
+                            ->numeric()
+                            ->required()
+                            ->disabled()  // Prevents user editing
+                            ->dehydrated(true)  // Ensures the value is saved
+                            ->reactive(),
                     ])->columns(4)->collapsible(true),
             ]);
     }
-    
+
 
     // Helper functions to calculate deductions
     private static function calculateWeeklyDeduction($loanAmount, $numberOfPayments)
@@ -183,8 +183,8 @@ class LoanResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('employee.full_name')
-                ->label('Employee')
-                ->searchable(['employees.first_name', 'employees.middle_name', 'employees.last_name']),
+                    ->label('Employee')
+                    ->searchable(['employees.first_name', 'employees.middle_name', 'employees.last_name']),
 
                 Tables\Columns\TextColumn::make('employee.employment_type') // Assuming there's an employment_type field
                     ->label('Employment Type'),
@@ -222,13 +222,13 @@ class LoanResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
-                ->hidden(fn($record) => $record->trashed()),
+                    ->hidden(fn($record) => $record->trashed()),
 
                 Tables\Actions\DeleteAction::make()->label('Deactivate')
-                ->modalSubmitActionLabel('Deactivate')
-                ->modalHeading('Deactivate Loan')
-                ->hidden(fn($record) => $record->trashed())
-                ->successNotificationTitle('Loan Deactivated'),
+                    ->modalSubmitActionLabel('Deactivate')
+                    ->modalHeading('Deactivate Loan')
+                    ->hidden(fn($record) => $record->trashed())
+                    ->successNotificationTitle('Loan Deactivated'),
 
                 Tables\Actions\ForceDeleteAction::make(),
                 Tables\Actions\RestoreAction::make(),
@@ -251,14 +251,14 @@ class LoanResource extends Resource
             //
         ];
     }
-    
+
     public static function getEloquentQuery(): Builder
-	{
-		return parent::getEloquentQuery()
-			->withoutGlobalScopes([
-				SoftDeletingScope::class,
-			]);
-	}
+    {
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                SoftDeletingScope::class,
+            ]);
+    }
 
     public static function getPages(): array
     {

@@ -17,7 +17,7 @@ class Position extends Model
         'HourlyRate',
     ];
 
-		public function employee()
+    public function employee()
     {
         return $this->belongsTo(Employee::class);
     }

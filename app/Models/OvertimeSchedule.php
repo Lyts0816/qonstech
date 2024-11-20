@@ -21,14 +21,8 @@ class OvertimeSchedule extends Model
         'Date',
         'Status',
     ];
-
-    // Define the relationship with the Employee model
     public function employee()
     {
         return $this->belongsTo(Employee::class, 'EmployeeID', 'id');
     }
-    
-    
-
-    
 }

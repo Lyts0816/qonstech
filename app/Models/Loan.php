@@ -41,5 +41,4 @@ class Loan extends Model
     {
         return $this->hasMany(LoanDtl::class, 'loanid', 'id'); // Adjust accordingly
     }
-
 }

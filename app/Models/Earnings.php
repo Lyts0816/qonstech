@@ -20,7 +20,7 @@ class Earnings extends Model
         'StartDate',
         'PeriodID',
         'is_disbursed',
-        
+
     ];
 
     public function employee()
@@ -31,9 +31,4 @@ class Earnings extends Model
     {
         return $this->belongsTo(WeekPeriod::class, 'PeriodID');
     }
-
-    // public function overtime()
-    // {
-    //     return $this->belongsTo(Overtime::class, 'OvertimeID');
-    // }
 }

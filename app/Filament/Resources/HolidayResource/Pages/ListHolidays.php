@@ -11,7 +11,6 @@ use Filament\Resources\Pages\ListRecords;
 class ListHolidays extends ListRecords
 {
     protected static string $resource = HolidayResource::class;
-
     protected function getHeaderActions(): array
     {
         return [
@@ -23,16 +22,16 @@ class ListHolidays extends ListRecords
     {
         return [
             'activeEmployees' => Tab::make('Active Holiday')
-            ->badge(Holiday::whereNull('deleted_at')->count()) 
-            ->modifyQueryUsing(function ($query) {
-                $query->whereNull('deleted_at'); 
-            }),
+                ->badge(Holiday::whereNull('deleted_at')->count())
+                ->modifyQueryUsing(function ($query) {
+                    $query->whereNull('deleted_at');
+                }),
 
             'archive' => Tab::make('Deactivated Holiday')
-            ->badge(Holiday::onlyTrashed()->count())
-            ->modifyQueryUsing(function ($query) {
-                $query->onlyTrashed();
-            }),
+                ->badge(Holiday::onlyTrashed()->count())
+                ->modifyQueryUsing(function ($query) {
+                    $query->onlyTrashed();
+                }),
         ];
     }
 }

@@ -26,20 +26,11 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class WorkSchedResource extends Resource
 {
     protected static ?string $model = WorkSched::class;
-
     protected static ?string $navigationLabel = 'Work Schedule';
     protected static ?string $navigationGroup = "Employee Details";
-
     protected static ?string $title = 'Work Schedule';
-
     protected static ?string $breadcrumb = "Work Schedule";
-
-
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-
-
-    // protected static ?string $navigationGroup = "Projects/Assign";
-
     protected static ?int $navigationSort = 5;
 
     public static function form(Form $form): Form
@@ -81,7 +72,7 @@ class WorkSchedResource extends Resource
                                     $set('CheckoutOne', '00:00');
                                     $set('CheckinTwo', '00:00');
                                     $set('CheckoutTwo', '00:00');
-                                }else{
+                                } else {
                                     $set('RegularHours', 8);
                                     $set('monday', 1);
                                     $set('tuesday', 1);
@@ -205,38 +196,32 @@ class WorkSchedResource extends Resource
 
             ->actions([
                 Tables\Actions\EditAction::make()
-                ->hidden(fn($record) => $record->trashed()),
+                    ->hidden(fn($record) => $record->trashed()),
 
                 Tables\Actions\DeleteAction::make()->label('Deactivate')
-                ->modalSubmitActionLabel('Deactivate')
-                ->modalHeading('Deactivate Work Schedule')
-                ->hidden(fn($record) => $record->trashed())
-                ->successNotificationTitle('Work Schedule Deactivated'),
+                    ->modalSubmitActionLabel('Deactivate')
+                    ->modalHeading('Deactivate Work Schedule')
+                    ->hidden(fn($record) => $record->trashed())
+                    ->successNotificationTitle('Work Schedule Deactivated'),
 
                 Tables\Actions\ForceDeleteAction::make(),
                 Tables\Actions\RestoreAction::make(),
             ])
-            ->bulkActions([
-                // Tables\Actions\BulkActionGroup::make([
-                //     Tables\Actions\DeleteBulkAction::make(),
-                // ]),
-            ]);
+            ->bulkActions([]);
     }
 
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 
     public static function getEloquentQuery(): Builder
-	{
-		return parent::getEloquentQuery()
-			->withoutGlobalScopes([
-				SoftDeletingScope::class,
-			]);
-	}
+    {
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                SoftDeletingScope::class,
+            ]);
+    }
 
     public static function getPages(): array
     {

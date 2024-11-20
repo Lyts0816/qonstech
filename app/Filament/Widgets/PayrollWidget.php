@@ -15,22 +15,21 @@ class PayrollWidget extends BaseWidget
 
     public static function canView(): bool
     {
-    return  Auth::user()->role === User::ROLE_ADMIN || Auth::user()->role === User::ROLE_ADMINUSER || Auth::user()->role === User::ROLE_FIVP;
-    // return false;
+        return  Auth::user()->role === User::ROLE_ADMIN || Auth::user()->role === User::ROLE_ADMINUSER || Auth::user()->role === User::ROLE_FIVP;
     }
 
     protected function getStats(): array
     {
         return [
             Stat::make('Total Payroll Generated', Payroll::count())
-            ->icon('heroicon-o-credit-card')
-            ->color('success')
-            ->description('Total number of payroll generated'),
+                ->icon('heroicon-o-credit-card')
+                ->color('success')
+                ->description('Total number of payroll generated'),
 
             Stat::make('Total Payslip Generated', Payslip::count())
-            ->icon('heroicon-o-credit-card')
-            ->color('success')
-            ->description('Total number of payslip generated'),
+                ->icon('heroicon-o-credit-card')
+                ->color('success')
+                ->description('Total number of payslip generated'),
         ];
     }
 }

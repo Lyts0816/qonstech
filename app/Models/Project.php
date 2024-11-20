@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Models;
+
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -35,7 +36,7 @@ class Project extends Model
 
     public function province()
     {
-        return $this->belongsTo(Province::class, 'PR_Province', 'provDesc'); // Maps the name directly
+        return $this->belongsTo(Province::class, 'PR_Province', 'provDesc');
     }
 
     public function city()
@@ -47,6 +48,4 @@ class Project extends Model
     {
         return $this->belongsTo(Barangay::class, 'PR_Barangay', 'brgyDesc');
     }
-
-
 }

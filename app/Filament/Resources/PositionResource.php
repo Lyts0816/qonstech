@@ -19,42 +19,35 @@ class PositionResource extends Resource
 {
     protected static ?string $model = Position::class;
     protected static ?string $navigationGroup = "Employee Details";
-
     protected static ?string $title = 'Position';
-
     protected static ?string $breadcrumb = "Position";
-
     protected static ?string $navigationLabel = 'Position';
-
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-
     protected static ?int $navigationSort = 2;
-
-    // protected static ?string $navigationGroup = "Projects/Assign";
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 TextInput::make('PositionName')
-                ->required(fn (string $context) => $context === 'create')
-                ->unique(ignoreRecord: true)
-                ->rules('regex:/^[^\d]*$/'),
+                    ->required(fn(string $context) => $context === 'create')
+                    ->unique(ignoreRecord: true)
+                    ->rules('regex:/^[^\d]*$/'),
 
-        TextInput::make('HourlyRate')
-            ->required(fn (string $context) => $context === 'create')
-            ->numeric() 
-            ->reactive() 
-            ->afterStateUpdated(function (callable $set, $state) {
-                
-                $monthlySalary = $state * 8 * 26; 
-                $set('MonthlySalary', $monthlySalary); 
-            }),
+                TextInput::make('HourlyRate')
+                    ->required(fn(string $context) => $context === 'create')
+                    ->numeric()
+                    ->reactive()
+                    ->afterStateUpdated(function (callable $set, $state) {
 
-            TextInput::make('MonthlySalary')
-                ->required(fn (string $context) => $context === 'create')
-                ->numeric() 
-                ->readOnly(),      
+                        $monthlySalary = $state * 8 * 26;
+                        $set('MonthlySalary', $monthlySalary);
+                    }),
+
+                TextInput::make('MonthlySalary')
+                    ->required(fn(string $context) => $context === 'create')
+                    ->numeric()
+                    ->readOnly(),
             ]);
     }
 
@@ -71,22 +64,18 @@ class PositionResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
-                ->hidden(fn($record) => $record->trashed()),
+                    ->hidden(fn($record) => $record->trashed()),
 
                 Tables\Actions\DeleteAction::make()->label('Deactivate')
-                ->modalSubmitActionLabel('Deactivate')
-                ->modalHeading('Deactivate Position')
-                ->hidden(fn($record) => $record->trashed())
-                ->successNotificationTitle('Position Deactivated'),
+                    ->modalSubmitActionLabel('Deactivate')
+                    ->modalHeading('Deactivate Position')
+                    ->hidden(fn($record) => $record->trashed())
+                    ->successNotificationTitle('Position Deactivated'),
 
                 Tables\Actions\ForceDeleteAction::make(),
                 Tables\Actions\RestoreAction::make(),
             ])
-            ->bulkActions([
-                // Tables\Actions\BulkActionGroup::make([
-                //     Tables\Actions\DeleteBulkAction::make(),
-                // ]),
-            ]);
+            ->bulkActions([]);
     }
 
     public static function getRelations(): array
@@ -97,12 +86,12 @@ class PositionResource extends Resource
     }
 
     public static function getEloquentQuery(): Builder
-	{
-		return parent::getEloquentQuery()
-			->withoutGlobalScopes([
-				SoftDeletingScope::class,
-			]);
-	}
+    {
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                SoftDeletingScope::class,
+            ]);
+    }
 
     public static function getPages(): array
     {

@@ -19,18 +19,11 @@ use PhpParser\Node\Stmt\Label;
 class SssResource extends Resource
 {
     protected static ?string $model = sss::class;
-
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-
     protected static ?string $navigationGroup = "Contribution";
-
     protected static ?string $title = 'SSS';
-
     protected static ?string $breadcrumb = "SSS";
-
     protected static ?string $navigationLabel = 'SSS';
-
-
 
     public static function form(Form $form): Form
     {
@@ -42,27 +35,27 @@ class SssResource extends Resource
                     ->numeric()
                     ->required()
                     ->placeholder('Enter minimum salary credit for this bracket'),
-    
+
                 // Maximum Salary Credit
                 TextInput::make('MaxSalary')
                     ->label('Maximum Salary Credit')
                     ->numeric()
                     ->required()
                     ->placeholder('Enter maximum salary credit for this bracket'),
-    
+
                 // Regular SS Contribution (Employer)
                 TextInput::make('EmployerShare')
                     ->label('Employer Regular SS Contribution (PHP)')
                     ->numeric()
                     ->required()
                     ->placeholder('Enter employer regular SS contribution'),
-    
+
                 // Regular SS Contribution (Employee)
                 TextInput::make('EmployeeShare')
                     ->label('Employee Regular SS Contribution (PHP)')
                     ->numeric()
                     ->required()
-                    ->placeholder('Enter employee regular SS contribution'),                  
+                    ->placeholder('Enter employee regular SS contribution'),
             ]);
     }
 
@@ -71,15 +64,15 @@ class SssResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('id')
-                ->label('SSS ID')
-                ->searchable(),
+                    ->label('SSS ID')
+                    ->searchable(),
 
                 TextColumn::make('MinSalary')
-                ->searchable(),
+                    ->searchable(),
 
                 TextColumn::make('MaxSalary')
-                ->searchable(),
-                
+                    ->searchable(),
+
                 TextColumn::make('EmployeeShare'),
                 TextColumn::make('EmployerShare'),
             ])
@@ -89,8 +82,7 @@ class SssResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
             ])
-            ->bulkActions([
-            ]);
+            ->bulkActions([]);
     }
 
     public static function getRelations(): array

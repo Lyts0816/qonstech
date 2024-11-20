@@ -16,8 +16,7 @@ class ListSsses extends ListRecords
     {
         return [
             Actions\CreateAction::make()
-            ->label('New SSS Contribution')
-            ,
+                ->label('New SSS Contribution'),
         ];
     }
 }

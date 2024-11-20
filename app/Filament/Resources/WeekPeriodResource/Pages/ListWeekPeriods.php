@@ -16,7 +16,7 @@ class ListWeekPeriods extends ListRecords
     {
         return [
             Actions\CreateAction::make()
-            ->label('Create Payroll Period'),
+                ->label('Create Payroll Period'),
         ];
     }
 
@@ -24,16 +24,16 @@ class ListWeekPeriods extends ListRecords
     {
         return [
             'activeEmployees' => Tab::make('Active Payroll Periods')
-            ->badge(WeekPeriod::whereNull('deleted_at')->count()) 
-            ->modifyQueryUsing(function ($query) {
-                $query->whereNull('deleted_at'); 
-            }),
+                ->badge(WeekPeriod::whereNull('deleted_at')->count())
+                ->modifyQueryUsing(function ($query) {
+                    $query->whereNull('deleted_at');
+                }),
 
             'archive' => Tab::make('Deactivated Payroll Periods')
-            ->badge(WeekPeriod::onlyTrashed()->count())
-            ->modifyQueryUsing(function ($query) {
-                $query->onlyTrashed();
-            }),
+                ->badge(WeekPeriod::onlyTrashed()->count())
+                ->modifyQueryUsing(function ($query) {
+                    $query->onlyTrashed();
+                }),
         ];
     }
 }

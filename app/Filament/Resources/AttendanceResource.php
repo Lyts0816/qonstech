@@ -37,17 +37,10 @@ class AttendanceResource extends Resource
     protected static ?string $title = 'Attendance';
     public static function form(Form $form): Form
     {
-        return $form->schema([
-            // Add your form fields here if needed
-        ]);
+        return $form->schema([]);
     }
-
-
-
     public static function table(Table $table): Table
     {
-
-
         return $table
             ->columns([
                 TextColumn::make('Date')
@@ -100,7 +93,6 @@ class AttendanceResource extends Resource
                             return $query;
                         }),
 
-
                     Filter::make('project_filter')
                         ->form([
                             Forms\Components\Grid::make()
@@ -117,12 +109,12 @@ class AttendanceResource extends Resource
                             function (Builder $query, array $data) {
                                 if (!empty($data['selectedProjectId'])) {
                                     Session::put('selected_project_id', $data['selectedProjectId']);
-                                    $query->where('ProjectID', $data['selectedProjectId']); // Make sure to use project_id for filtering
+                                    $query->where('ProjectID', $data['selectedProjectId']);
                                 } else {
                                     $query->where(function ($query) {
                                         $query->where('ProjectID', 0)
                                             ->orWhereNull('ProjectID');
-                                    }); // Make sure to use project_id for filtering
+                                    });
                                     Session::put('selected_project_id', null);
                                 }
                                 return $query;
@@ -159,17 +151,14 @@ class AttendanceResource extends Resource
                                 if (!empty($data['end_date'])) {
                                     Session::put('endDate', $data['end_date']);
                                     $query->whereBetween('Date', [Session::get('startDate'), $data['end_date']]);
-                                    // $query->where('Date', '>=', $data['end_date']);
                                 }
                                 return $query;
                             }
                         ),
-
                 ],
 
                 layout: FiltersLayout::AboveContent
             )
-
             ->headerActions([
                 Action::make('uploadBiometrics')
                     ->label('Upload Biometrics')
@@ -305,7 +294,7 @@ class AttendanceResource extends Resource
                     ->color('success')
                     ->form([
                         Select::make('SelectPayroll')
-                            ->label('Select Payroll') // Label for the field
+                            ->label('Select Payroll')
                             ->required(fn(string $context) => $context === 'create' || $context === 'edit')
                             ->options(function () {
                                 return Payroll::with('project')
@@ -314,7 +303,7 @@ class AttendanceResource extends Resource
                                     ->orderBy('PayrollDate2')
                                     ->get()
                                     ->mapWithKeys(function ($payroll) {
-                                        $projectName = $payroll->project->ProjectName ?? 'No Project'; // Use 'No Project' if the name is null
+                                        $projectName = $payroll->project->ProjectName ?? 'No Project';
                                         $displayText = "{$payroll->PayrollMonth},{$payroll->PayrollYear} - {$payroll->PayrollDate2} | {$payroll->EmployeeStatus} - {$payroll->assignment} | {$projectName}";
                                         return [$payroll->id => $displayText];
                                     });
@@ -330,14 +319,9 @@ class AttendanceResource extends Resource
                         ]));
                     })
                     ->openUrlInNewTab()
-
             ])
             ->bulkActions([]);
-
-
     }
-
-
 
     public static function getRelations(): array
     {
@@ -351,7 +335,7 @@ class AttendanceResource extends Resource
         return [
             'index' => Pages\ListAttendances::route('/'),
             'create' => Pages\CreateAttendance::route('/create'),
-            // 'edit' => Pages\EditAttendance::route('/{record}/edit'),
+
         ];
     }
 }

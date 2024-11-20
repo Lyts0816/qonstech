@@ -13,7 +13,7 @@ class CreatePhilhealth extends CreateRecord
     protected static ?string $title = 'Create PHILHEALTH Contribution';
 
     protected function getRedirectUrl(): string
-{
-    return $this->getResource()::getUrl('index');
-}
+    {
+        return $this->getResource()::getUrl('index');
+    }
 }

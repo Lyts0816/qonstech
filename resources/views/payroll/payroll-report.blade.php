@@ -130,7 +130,6 @@
                     {{-- <p>Period covered: {{ $employeeda['Period'] ?? '' }}</p> --}}
                     <p>Period covered: {{ $formattedPeriod }}</p>
                     <p class="project-name">{{ $employeeda['ProjectName'] ?? '' }}</p>
-
                 @endif
             </div>
             <img src="{{ asset('images/qonstech.png') }}" alt="Company Logo" class="logo">
@@ -142,23 +141,11 @@
                     <th rowspan="2">ID</th>
                     <th rowspan="2">Name</th>
                     <th rowspan="2">Position</th>
-                    {{-- <th rowspan="2">Project Site</th> --}}
                     <th rowspan="2">Monthly Salary</th>
                     <th rowspan="2">Hourly Rate</th>
-                    {{-- <th rowspan="2">Salary Type</th>
-                    <th rowspan="2">Regular Status</th> --}}
-                    <th rowspan="2">Regular Hours</th>
-                    <!-- <th rowspan="2">Absences</th> -->
-                    <th rowspan="2">Total Hours</th>
+                    <th rowspan="2">Regular Hours</th <th rowspan="2">Total Hours</th>
                     <th rowspan="2">O.T Hours</th>
-                    {{-- <th rowspan="2">Sunday Hours</th> --}}
                     <th colspan="2">Holidays</th>
-                    {{-- <th rowspan="2">Paid Amount For Regular Hours (Basic Pay)</th> --}}
-                    {{-- <th rowspan="2">Paid Amount For O.T Hours 25%</th> --}}
-                    {{-- <th rowspan="2">Paid Amount For Sunday Hours 30%</th> --}}
-                    {{-- <th rowspan="2">Paid Amount For Legal Holiday</th>
-                    <th rowspan="2">Paid Amount For Special Holiday 30%</th> --}}
-                    {{-- <th rowspan="2">Other Allowance</th> --}}
                     <th rowspan="2">Earnings Amount</th>
                     <th rowspan="2">Gross Amount</th>
                     <th colspan=10">Deductions</th>
@@ -167,7 +154,7 @@
                     <th rowspan="2">SIGNATURE</th>
                 </tr>
                 <tr>
-                    
+
                     <th>Regular Holiday Hours</th>
                     <th>Special Holiday Hours</th>
                     <th>Tardiness</th>
@@ -176,15 +163,10 @@
                     <th>SSS</th>
                     <th>PHIC</th>
                     <th>HDMF</th>
-                    {{-- <th>Total Government Deduction</th> --}}
                     <th>Cash Advances</th>
                     <th>SSS LOAN</th>
                     <th>SALARY LOAN</th>
                     <th>HDMF LOAN</th>
-                    <!-- <th>Salary Loan</th> -->
-                    <!-- <th>SSS Loan</th> -->
-                    <!-- <th>HDMF Loan</th> -->
-                    {{-- <th>Total Office Deduction & Adjustment</th> --}}
                 </tr>
             </thead>
             <tbody>
@@ -200,21 +182,10 @@
 
 
                         <td>{{ number_format($employee['TotalHours'] ?? 0, 2) }}</td>
-
-                        {{-- <td>{{ $employee['SalaryType'] ?? '' }}</td>
-                        <td>{{ $employee['RegularStatus'] ?? '' }}</td> --}}
                         <td>{{ number_format($employee['TotalHours'] ?? 0, 2) }}</td>
                         <td>{{ number_format($employee['TotalOvertimeHours'] ?? 0, 2) }}</td>
-                        
-                        {{-- <td>{{ $employee['TotalHoursSunday'] ?? 0 }}</td> --}}
                         <td>{{ $employee['TotalHrsRegularHol'] ?? 0 }}</td>
                         <td>{{ $employee['TotalHrsSpecialHol'] ?? 0 }}</td>
-                        {{-- <td>p{{ number_format($employee['BasicPay'] ?? 0, 2) }}</td> --}}
-                        {{-- <td>p{{ number_format($employee['TotalOvertimePay'] ?? 0, 2) }}</td> --}}
-                        {{-- <td>p{{ number_format($employee['SundayPay'] ?? 0, 2) }}</td> --}}
-                        {{-- <td>p{{ number_format($employee['RegularHolidayPay'] ?? 0, 2) }}</td>
-                        <td>p{{ number_format($employee['SpecialHolidayPay'] ?? 0, 2) }}</td> --}}
-                        {{-- <td>p{{ number_format($employee['EarningPay'] ?? 0, 2) }}</td> --}}
                         <td>P{{ number_format($employee['EarningPay'] ?? 0, 2) }}</td>
                         <td>P{{ number_format($employee['GrossPay'] ?? 0, 2) }}</td>
                         <td>P{{ number_format($employee['TotalTardinessDed'] ?? 0, 2) }}</td>
@@ -223,14 +194,11 @@
 
                         <td>P{{ number_format($employee['SSSDeduction'] ?? 0, 2) }}</td>
                         <td>P{{ number_format($employee['PhilHealthDeduction'] ?? 0, 2) }}</td>
-                        <td>P{{number_format($employee['PagIbigDeduction'] ?? 0, 2) }}</td>
-
-                        {{-- <td>P{{ number_format($employee['TotalGovDeductions'] ?? 0, 2) }}</td> --}}
+                        <td>P{{ number_format($employee['PagIbigDeduction'] ?? 0, 2) }}</td>
                         <td>P{{ number_format($employee['DeductionFee'] ?? 0, 2) }}</td>
-                        <td>P{{number_format($employee['SSSLoan'] ?? 0, 2) }}</td>
-                        <td>P{{number_format($employee['SalaryLoan'] ?? 0, 2) }}</td>
-                        <td>P{{number_format($employee['PagibigLoan'] ?? 0, 2) }}</td>
-                        {{-- <td>P{{ number_format($employee['TotalOfficeDeductions'] ?? 0) }}</td> --}}
+                        <td>P{{ number_format($employee['SSSLoan'] ?? 0, 2) }}</td>
+                        <td>P{{ number_format($employee['SalaryLoan'] ?? 0, 2) }}</td>
+                        <td>P{{ number_format($employee['PagibigLoan'] ?? 0, 2) }}</td>
 
                         <!-- <td>P{{ number_format('0') }}</td>
                                 <td>P{{ number_format('0') }}</td>
@@ -272,8 +240,10 @@
     <button id="exportPDF">Export to PDF</button>
 
     <script>
-        document.getElementById('exportPDF').addEventListener('click', function () {
-            const { jsPDF } = window.jspdf;
+        document.getElementById('exportPDF').addEventListener('click', function() {
+            const {
+                jsPDF
+            } = window.jspdf;
 
             // Initialize jsPDF with landscape orientation and a custom size (8x13 inches)
             const doc = new jsPDF('landscape', 'pt', [576, 936]);
@@ -282,21 +252,20 @@
 
             if (element) {
                 doc.html(element, {
-                    callback: function (doc) {
+                    callback: function(doc) {
                         doc.save('payroll-report.pdf');
                     },
                     x: 10,
                     y: 10,
                     autoPaging: 'text',
-                    width: 900,          // Adjusted width to ensure the table fits well
-                    windowWidth: 1300,    // Adjusted window width for better scaling
-                    scale: 0.8            // Scales content to fit within defined dimensions
+                    width: 900,
+                    windowWidth: 1300,
+                    scale: 0.8
                 });
             } else {
                 console.error('Element .container not found!');
             }
         });
-
     </script>
 </body>
 

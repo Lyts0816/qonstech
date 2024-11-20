@@ -39,28 +39,28 @@ class PhilhealthResource extends Resource
                     ->numeric()
                     ->required()
                     ->placeholder('Enter minimum salary for this bracket'),
-    
+
                 // Maximum Salary
                 TextInput::make('MaxSalary')
                     ->label('Maximum Salary')
                     ->numeric()
                     ->required()
                     ->placeholder('Enter maximum salary for this bracket'),
-    
+
                 // Contribution Amount
                 TextInput::make('ContributionAmount')
                     ->label('PhilHealth Contribution Amount (PHP)')
                     ->numeric()
                     ->required()
                     ->placeholder('Enter contribution amount for this bracket'),
-    
+
                 // Contribution Rate
                 TextInput::make('PremiumRate')
                     ->label('PhilHealth Contribution Rate (%)')
                     ->numeric()
                     ->required()
                     ->placeholder('Enter contribution rate (e.g., 5 for 5%)'),
-    
+
             ]);
     }
 
@@ -69,15 +69,15 @@ class PhilhealthResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('id')
-                ->label('SSS ID')
-                ->searchable(),
+                    ->label('SSS ID')
+                    ->searchable(),
 
                 TextColumn::make('MinSalary')
-                ->searchable(),
+                    ->searchable(),
 
                 TextColumn::make('MaxSalary')
-                ->searchable(),
-                
+                    ->searchable(),
+
                 TextColumn::make('PremiumRate'),
                 TextColumn::make('ContributionAmount'),
             ])
@@ -88,9 +88,7 @@ class PhilhealthResource extends Resource
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    
-                ]),
+                Tables\Actions\BulkActionGroup::make([]),
             ]);
     }
 
